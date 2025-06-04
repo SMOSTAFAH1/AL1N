@@ -1,4 +1,4 @@
-package com.grupo1.al1n;
+package com.grupo1.al1n.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.grupo1.al1n.R;
+import com.grupo1.al1n.CryptoDetailActivity;
 import com.grupo1.al1n.models.CryptoItem;
+import com.bumptech.glide.Glide;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -41,6 +44,18 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
         holder.symbolTextView.setText(crypto.getSymbol());
         holder.nameTextView.setText(crypto.getName());
         holder.priceTextView.setText("$" + decimalFormat.format(crypto.getPrice()));
+          // Cargar imagen de la criptomoneda usando Glide
+        if (crypto.getImageUrl() != null && !crypto.getImageUrl().isEmpty()) {
+            Glide.with(context)
+                .load(crypto.getImageUrl())
+                .placeholder(R.drawable.ic_circle_placeholder) // Imagen por defecto mientras carga
+                .error(R.drawable.ic_circle_placeholder)       // Imagen por defecto si hay error
+                .circleCrop()                                  // Hacer la imagen circular
+                .into(holder.iconImageView);
+        } else {
+            // Si no hay URL de imagen, usar placeholder
+            holder.iconImageView.setImageResource(R.drawable.ic_circle_placeholder);
+        }
         
         // Format price change
         double priceChange = crypto.getPriceChangePercentage24h();
