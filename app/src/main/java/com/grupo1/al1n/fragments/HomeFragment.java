@@ -20,6 +20,7 @@ import com.grupo1.al1n.models.CoinMarketCapResponse;
 import com.grupo1.al1n.services.CoinMarketCapClient;
 import com.grupo1.al1n.services.CoinMarketCapService;
 import com.grupo1.al1n.utils.CryptoDataMapper;
+import com.grupo1.al1n.utils.CryptoDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,13 +121,15 @@ public class HomeFragment extends Fragment {
                     
                     // Convertir respuesta a lista de CryptoItem
                     List<CryptoItem> apiCryptoList = CryptoDataMapper.mapToCryptoItems(response.body());
-                    
-                    // Actualizar la lista en el hilo principal
+                      // Actualizar la lista en el hilo principal
                     if (getActivity() != null) {
                         getActivity().runOnUiThread(() -> {
                             cryptoList.clear();
                             cryptoList.addAll(apiCryptoList);
                             cryptoAdapter.notifyDataSetChanged();
+                            
+                            // Guardar los datos en CryptoDataHolder para el autocompletado
+                            CryptoDataHolder.getInstance().updateCryptos(apiCryptoList);
                             
                             Log.d(TAG, "Lista actualizada con " + cryptoList.size() + " criptomonedas");
                         });
@@ -218,9 +221,11 @@ public class HomeFragment extends Fragment {
             10, "DOT", "Polkadot", 7.82, -1.89, 
             9800000000.0, 180000000.0, false
         ));
-        
-        // Notificar al adapter que los datos han cambiado
+          // Notificar al adapter que los datos han cambiado
         cryptoAdapter.notifyDataSetChanged();
+        
+        // Guardar los datos de ejemplo en CryptoDataHolder
+        CryptoDataHolder.getInstance().updateCryptos(cryptoList);
         
         Log.d(TAG, "Datos de ejemplo cargados: " + cryptoList.size() + " elementos");
     }

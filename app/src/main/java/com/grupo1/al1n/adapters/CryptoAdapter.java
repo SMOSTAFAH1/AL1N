@@ -15,7 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.grupo1.al1n.R;
 import com.grupo1.al1n.CryptoDetailActivity;
 import com.grupo1.al1n.models.CryptoItem;
+import com.grupo1.al1n.models.FavoriteItem;
+import com.grupo1.al1n.database.FavoritesDao;
 import com.bumptech.glide.Glide;
+import android.widget.Toast;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -25,11 +28,13 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
     private List<CryptoItem> cryptoList;
     private Context context;
     private DecimalFormat decimalFormat;
+    private FavoritesDao favoritesDao;
 
     public CryptoAdapter(Context context, List<CryptoItem> cryptoList) {
         this.context = context;
         this.cryptoList = cryptoList;
         this.decimalFormat = new DecimalFormat("#,##0.00");
+        this.favoritesDao = new FavoritesDao(context);
     }
 
     @NonNull
@@ -40,10 +45,9 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
     }    @Override
     public void onBindViewHolder(@NonNull CryptoViewHolder holder, int position) {
         CryptoItem crypto = cryptoList.get(position);
-        
-        holder.symbolTextView.setText(crypto.getSymbol());
+          holder.symbolTextView.setText(crypto.getSymbol());
         holder.nameTextView.setText(crypto.getName());
-        holder.priceTextView.setText("$" + decimalFormat.format(crypto.getPrice()));
+        holder.priceTextView.setText("$" + decimalFormat.format(crypto.getCurrentPrice()));
           // Cargar imagen de la criptomoneda usando Glide
         if (crypto.getImageUrl() != null && !crypto.getImageUrl().isEmpty()) {
             Glide.with(context)
@@ -65,28 +69,55 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
         int colorRes = priceChange >= 0 ? R.color.green : R.color.red;
         holder.priceChangeTextView.setTextColor(context.getResources().getColor(colorRes));          // Set click listener for the entire item
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, CryptoDetailActivity.class);
-            intent.putExtra("crypto_symbol", crypto.getSymbol());
+            Intent intent = new Intent(context, CryptoDetailActivity.class);            intent.putExtra("crypto_symbol", crypto.getSymbol());
             intent.putExtra("crypto_name", crypto.getName());
-            intent.putExtra("crypto_price", crypto.getPrice());
+            intent.putExtra("crypto_price", crypto.getCurrentPrice());
             intent.putExtra("crypto_change", crypto.getPriceChangePercentage24h());
             intent.putExtra("crypto_market_cap", crypto.getMarketCap());
-            intent.putExtra("crypto_volume", crypto.getVolume24h());
+            intent.putExtra("crypto_volume", crypto.getTotalVolume());
             intent.putExtra("crypto_rank", crypto.getRank());
             context.startActivity(intent);
         });
-        
-        // Set favorite button click listener
+          // Set favorite button click listener
         holder.favoriteButton.setOnClickListener(v -> {
-            // TODO: Implement favorites functionality in Paso 4
-            // For now, just show a simple toggle effect
-            crypto.setFavorite(!crypto.isFavorite());
-            int iconRes = crypto.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
-            holder.favoriteButton.setImageResource(iconRes);
+            // Verificar si ya está en favoritos
+            boolean isCurrentlyFavorite = favoritesDao.isFavorite(crypto.getSymbol());
+            
+            if (isCurrentlyFavorite) {
+                // Remover de favoritos
+                favoritesDao.deleteFavoriteBySymbol(crypto.getSymbol());
+                crypto.setFavorite(false);
+                holder.favoriteButton.setImageResource(R.drawable.ic_favorite_border);
+                
+                // Mostrar mensaje
+                Toast.makeText(context, crypto.getName() + " removido de favoritos", Toast.LENGTH_SHORT).show();
+            } else {
+                // Agregar a favoritos
+                FavoriteItem favoriteItem = new FavoriteItem(
+                    crypto.getSymbol(),
+                    crypto.getName(),
+                    crypto.getCurrentPrice(),
+                    crypto.getImageUrl(),
+                    false // no está pinned por defecto
+                );
+                
+                long result = favoritesDao.insertFavorite(favoriteItem);
+                if (result != -1) {
+                    crypto.setFavorite(true);
+                    holder.favoriteButton.setImageResource(R.drawable.ic_favorite);
+                    
+                    // Mostrar mensaje
+                    Toast.makeText(context, crypto.getName() + " agregado a favoritos", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Error al agregar a favoritos", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
         
-        // Set favorite button state
-        int iconRes = crypto.isFavorite() ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
+        // Set favorite button state based on database
+        boolean isFavorite = favoritesDao.isFavorite(crypto.getSymbol());
+        crypto.setFavorite(isFavorite);
+        int iconRes = isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
         holder.favoriteButton.setImageResource(iconRes);
     }
 

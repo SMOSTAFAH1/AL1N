@@ -28,8 +28,7 @@ public class FavoritesDao {
     public FavoritesDao(Context context) {
         dbHelper = new FavoritesDbHelper(context);
     }
-    
-    /**
+      /**
      * Inserta un nuevo favorito en la base de datos
      * @param favorite Favorito a insertar
      * @return ID del favorito insertado, -1 si hay error
@@ -38,6 +37,7 @@ public class FavoritesDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
         ContentValues values = new ContentValues();
+        values.put(FavoritesDbHelper.COLUMN_SYMBOL, favorite.getSymbol());
         values.put(FavoritesDbHelper.COLUMN_NAME, favorite.getName());
         values.put(FavoritesDbHelper.COLUMN_PRICE, favorite.getPrice());
         values.put(FavoritesDbHelper.COLUMN_ICON_URL, favorite.getIconUrl());
@@ -46,9 +46,9 @@ public class FavoritesDao {
         long id = db.insert(FavoritesDbHelper.TABLE_FAVORITES, null, values);
         
         if (id != -1) {
-            Log.d(TAG, "Favorito insertado: " + favorite.getName() + " con ID: " + id);
+            Log.d(TAG, "Favorito insertado: " + favorite.getSymbol() + " - " + favorite.getName() + " con ID: " + id);
         } else {
-            Log.e(TAG, "Error al insertar favorito: " + favorite.getName());
+            Log.e(TAG, "Error al insertar favorito: " + favorite.getSymbol() + " - " + favorite.getName());
         }
         
         db.close();
@@ -251,23 +251,22 @@ public class FavoritesDao {
         
         return count;
     }
-    
-    /**
+      /**
      * Convierte un cursor en un objeto FavoriteItem
      * @param cursor Cursor de la base de datos
      * @return Objeto FavoriteItem
      */
     private FavoriteItem cursorToFavorite(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_ID));
+        String symbol = cursor.getString(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_SYMBOL));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_NAME));
         double price = cursor.getDouble(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_PRICE));
         String iconUrl = cursor.getString(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_ICON_URL));
         boolean pinned = cursor.getInt(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_PINNED)) == 1;
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_CREATED_AT));
         
-        return new FavoriteItem(id, name, price, iconUrl, pinned, createdAt);
-    }
-      /**
+        return new FavoriteItem(id, symbol, name, price, iconUrl, pinned, createdAt);
+    }    /**
      * Actualiza un favorito completo
      * @param favorite Favorito con datos actualizados
      * @return Número de filas afectadas
@@ -276,6 +275,7 @@ public class FavoritesDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
         ContentValues values = new ContentValues();
+        values.put(FavoritesDbHelper.COLUMN_SYMBOL, favorite.getSymbol());
         values.put(FavoritesDbHelper.COLUMN_NAME, favorite.getName());
         values.put(FavoritesDbHelper.COLUMN_PRICE, favorite.getPrice());
         values.put(FavoritesDbHelper.COLUMN_ICON_URL, favorite.getIconUrl());
@@ -295,6 +295,89 @@ public class FavoritesDao {
         
         db.close();
         return rowsAffected;
+    }
+
+    /**
+     * Verifica si una criptomoneda está en favoritos por símbolo
+     * @param symbol Símbolo de la criptomoneda (ej: BTC, ETH)
+     * @return true si está en favoritos, false si no
+     */
+    public boolean isFavorite(String symbol) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
+        String[] selectionArgs = { symbol };
+        
+        Cursor cursor = db.query(
+            FavoritesDbHelper.TABLE_FAVORITES,
+            new String[]{FavoritesDbHelper.COLUMN_ID}, // Solo necesitamos el ID
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        );
+        
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        
+        return exists;
+    }
+
+    /**
+     * Elimina un favorito por símbolo
+     * @param symbol Símbolo de la criptomoneda a eliminar
+     * @return Número de filas eliminadas
+     */
+    public int deleteFavoriteBySymbol(String symbol) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        
+        String whereClause = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
+        String[] whereArgs = { symbol };
+        
+        int rowsDeleted = db.delete(
+            FavoritesDbHelper.TABLE_FAVORITES,
+            whereClause,
+            whereArgs
+        );
+        
+        Log.d(TAG, "Favorito eliminado. Símbolo: " + symbol + ", Filas afectadas: " + rowsDeleted);
+        
+        db.close();
+        return rowsDeleted;
+    }
+
+    /**
+     * Obtiene un favorito por símbolo
+     * @param symbol Símbolo de la criptomoneda
+     * @return Favorito encontrado o null si no existe
+     */
+    public FavoriteItem getFavoriteBySymbol(String symbol) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        
+        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
+        String[] selectionArgs = { symbol };
+        
+        Cursor cursor = db.query(
+            FavoritesDbHelper.TABLE_FAVORITES,
+            null,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            null
+        );
+        
+        FavoriteItem favorite = null;
+        if (cursor.moveToFirst()) {
+            favorite = cursorToFavorite(cursor);
+        }
+        
+        cursor.close();
+        db.close();
+        
+        return favorite;
     }
 
     /**

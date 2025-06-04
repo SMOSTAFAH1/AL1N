@@ -9,16 +9,16 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Maneja la creación, actualización y estructura de la tabla favorites
  */
 public class FavoritesDbHelper extends SQLiteOpenHelper {
-    
-    // Información de la base de datos
+      // Información de la base de datos
     private static final String DATABASE_NAME = "al1n_favorites.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2; // Incrementar versión para agregar symbol
     
     // Nombre de la tabla
     public static final String TABLE_FAVORITES = "favorites";
     
     // Columnas de la tabla
     public static final String COLUMN_ID = "id";
+    public static final String COLUMN_SYMBOL = "symbol";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_PRICE = "price";
     public static final String COLUMN_ICON_URL = "iconUrl";
@@ -29,7 +29,8 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
     private static final String SQL_CREATE_TABLE = 
         "CREATE TABLE " + TABLE_FAVORITES + " (" +
             COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            COLUMN_NAME + " TEXT NOT NULL UNIQUE, " +
+            COLUMN_SYMBOL + " TEXT NOT NULL UNIQUE, " +
+            COLUMN_NAME + " TEXT NOT NULL, " +
             COLUMN_PRICE + " REAL DEFAULT 0.0, " +
             COLUMN_ICON_URL + " TEXT, " +
             COLUMN_PINNED + " INTEGER DEFAULT 0, " +
@@ -69,20 +70,19 @@ public class FavoritesDbHelper extends SQLiteOpenHelper {
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
-    
-    /**
+      /**
      * Inserta datos de ejemplo en la tabla de favoritos
      * @param db Base de datos donde insertar
      */
     private void insertSampleData(SQLiteDatabase db) {
         // Insertar algunos favoritos de ejemplo
         String insertBTC = "INSERT INTO " + TABLE_FAVORITES + 
-            " (" + COLUMN_NAME + ", " + COLUMN_PRICE + ", " + COLUMN_ICON_URL + ", " + COLUMN_PINNED + ") " +
-            "VALUES ('Bitcoin', 67234.50, 'https://s2.coinmarketcap.com/static/img/coins/128x128/1.png', 1)";
+            " (" + COLUMN_SYMBOL + ", " + COLUMN_NAME + ", " + COLUMN_PRICE + ", " + COLUMN_ICON_URL + ", " + COLUMN_PINNED + ") " +
+            "VALUES ('BTC', 'Bitcoin', 67234.50, 'https://s2.coinmarketcap.com/static/img/coins/128x128/1.png', 1)";
         
         String insertETH = "INSERT INTO " + TABLE_FAVORITES + 
-            " (" + COLUMN_NAME + ", " + COLUMN_PRICE + ", " + COLUMN_ICON_URL + ", " + COLUMN_PINNED + ") " +
-            "VALUES ('Ethereum', 2456.78, 'https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png', 0)";
+            " (" + COLUMN_SYMBOL + ", " + COLUMN_NAME + ", " + COLUMN_PRICE + ", " + COLUMN_ICON_URL + ", " + COLUMN_PINNED + ") " +
+            "VALUES ('ETH', 'Ethereum', 2456.78, 'https://s2.coinmarketcap.com/static/img/coins/128x128/1027.png', 0)";
         
         try {
             db.execSQL(insertBTC);

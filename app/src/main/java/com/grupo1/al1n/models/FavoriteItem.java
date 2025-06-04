@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class FavoriteItem implements Serializable {
     
     private long id;
+    private String symbol;
     private String name;
     private double price;
     private String iconUrl;
@@ -20,12 +21,12 @@ public class FavoriteItem implements Serializable {
      */
     public FavoriteItem() {
     }
-    
-    /**
+      /**
      * Constructor completo
      */
-    public FavoriteItem(long id, String name, double price, String iconUrl, boolean pinned, long createdAt) {
+    public FavoriteItem(long id, String symbol, String name, double price, String iconUrl, boolean pinned, long createdAt) {
         this.id = id;
+        this.symbol = symbol;
         this.name = name;
         this.price = price;
         this.iconUrl = iconUrl;
@@ -34,9 +35,10 @@ public class FavoriteItem implements Serializable {
     }
     
     /**
-     * Constructor para nuevo favorito (sin ID)
+     * Constructor para nuevo favorito (sin ID) - usado por CryptoAdapter
      */
-    public FavoriteItem(String name, double price, String iconUrl, boolean pinned) {
+    public FavoriteItem(String symbol, String name, double price, String iconUrl, boolean pinned) {
+        this.symbol = symbol;
         this.name = name;
         this.price = price;
         this.iconUrl = iconUrl;
@@ -45,9 +47,21 @@ public class FavoriteItem implements Serializable {
     }
     
     /**
+     * Constructor para nuevo favorito (sin ID) - versión anterior
+     */
+    public FavoriteItem(String name, double price, String iconUrl, boolean pinned) {
+        this.symbol = name; // Para compatibilidad
+        this.name = name;
+        this.price = price;
+        this.iconUrl = iconUrl;
+        this.pinned = pinned;
+        this.createdAt = System.currentTimeMillis() / 1000; // Unix timestamp
+    }
+      /**
      * Constructor básico para solo nombre
      */
     public FavoriteItem(String name) {
+        this.symbol = name; // Para compatibilidad
         this.name = name;
         this.price = 0.0;
         this.iconUrl = "";
@@ -62,6 +76,14 @@ public class FavoriteItem implements Serializable {
     
     public void setId(long id) {
         this.id = id;
+    }
+    
+    public String getSymbol() {
+        return symbol;
+    }
+    
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
     
     public String getName() {
@@ -103,11 +125,11 @@ public class FavoriteItem implements Serializable {
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
     }
-    
-    @Override
+      @Override
     public String toString() {
         return "FavoriteItem{" +
                 "id=" + id +
+                ", symbol='" + symbol + '\'' +
                 ", name='" + name + '\'' +
                 ", price=" + price +
                 ", iconUrl='" + iconUrl + '\'' +
@@ -121,11 +143,11 @@ public class FavoriteItem implements Serializable {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         FavoriteItem that = (FavoriteItem) obj;
-        return id == that.id || (name != null && name.equals(that.name));
+        return id == that.id || (symbol != null && symbol.equals(that.symbol));
     }
     
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : (int) id;
+        return symbol != null ? symbol.hashCode() : (int) id;
     }
 }

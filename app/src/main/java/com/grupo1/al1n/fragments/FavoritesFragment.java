@@ -7,11 +7,11 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.text.TextUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,12 +24,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.grupo1.al1n.R;
 import com.grupo1.al1n.adapters.FavoriteAdapter;
+import com.grupo1.al1n.adapters.CryptoSearchAdapter;
 import com.grupo1.al1n.database.FavoritesDao;
-import com.grupo1.al1n.database.FavoritesDbHelper;
 import com.grupo1.al1n.models.FavoriteItem;
+import com.grupo1.al1n.models.CryptoItem;
+import com.grupo1.al1n.utils.CryptoDataHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -221,75 +225,110 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
                 showAddFavoriteDialog();
             }
         });
-    }
-
-    /**
-     * Muestra el dialog para agregar un favorito
+    }    /**
+     * Muestra el dialog inteligente para buscar y agregar cryptos
      */
     private void showAddFavoriteDialog() {
+        // Verificar si hay datos disponibles
+        if (!CryptoDataHolder.getInstance().hasData()) {
+            Toast.makeText(getContext(), 
+                "Por favor espera a que se carguen las criptomonedas del Home", 
+                Toast.LENGTH_LONG).show();
+            return;
+        }
+        
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Agregar Crypto Favorito");
+        builder.setTitle("Agregar a Favoritos");
         
         // Crear layout del dialog
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_favorite, null);
-        EditText etCryptoName = dialogView.findViewById(R.id.etCryptoName);
-        EditText etCryptoPrice = dialogView.findViewById(R.id.etCryptoPrice);
-        EditText etCryptoIcon = dialogView.findViewById(R.id.etCryptoIcon);
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_search_crypto, null);
+        TextInputEditText etSearchCrypto = dialogView.findViewById(R.id.etSearchCrypto);
+        RecyclerView rvSearchResults = dialogView.findViewById(R.id.rvSearchResults);
+        TextView tvNoResults = dialogView.findViewById(R.id.tvNoResults);
         
         builder.setView(dialogView);
+        builder.setNegativeButton("Cancelar", null);
         
-        builder.setPositiveButton("Agregar", (dialog, which) -> {
-            String name = etCryptoName.getText().toString().trim();
-            String priceStr = etCryptoPrice.getText().toString().trim();
-            String iconUrl = etCryptoIcon.getText().toString().trim();
-            
-            if (validateInput(name, priceStr)) {
-                try {
-                    double price = Double.parseDouble(priceStr);
-                    addFavorite(name, price, iconUrl);
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getContext(), "Precio inválido", Toast.LENGTH_SHORT).show();
-                }
-            }
+        AlertDialog dialog = builder.create();
+        
+        // Configurar RecyclerView de búsqueda
+        List<CryptoItem> searchResults = new ArrayList<>();
+        CryptoSearchAdapter searchAdapter = new CryptoSearchAdapter(getContext(), searchResults, crypto -> {
+            addCryptoToFavorites(crypto);
+            dialog.dismiss();
         });
         
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
-    }
-
-    /**
-     * Valida la entrada del usuario
+        rvSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvSearchResults.setAdapter(searchAdapter);
+        
+        // Configurar búsqueda en tiempo real
+        etSearchCrypto.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String query = s.toString().trim();
+                
+                if (query.isEmpty()) {
+                    // Mostrar mensaje inicial
+                    rvSearchResults.setVisibility(View.GONE);
+                    tvNoResults.setVisibility(View.VISIBLE);
+                    tvNoResults.setText("Escribe para buscar criptomonedas");
+                } else {
+                    // Buscar cryptos
+                    List<CryptoItem> results = CryptoDataHolder.getInstance().searchCryptos(query);
+                    
+                    if (results.isEmpty()) {
+                        rvSearchResults.setVisibility(View.GONE);
+                        tvNoResults.setVisibility(View.VISIBLE);
+                        tvNoResults.setText("No se encontraron resultados para \"" + query + "\"");
+                    } else {
+                        tvNoResults.setVisibility(View.GONE);
+                        rvSearchResults.setVisibility(View.VISIBLE);
+                        searchAdapter.updateList(results);
+                    }
+                }
+            }
+            
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+        
+        dialog.show();
+    }/**
+     * Agrega una crypto seleccionada a favoritos
+     * @param crypto La crypto seleccionada del autocompletado
      */
-    private boolean validateInput(String name, String price) {
-        if (TextUtils.isEmpty(name)) {
-            Toast.makeText(getContext(), "El nombre es requerido", Toast.LENGTH_SHORT).show();
-            return false;
+    private void addCryptoToFavorites(CryptoItem crypto) {
+        // Verificar si ya está en favoritos
+        if (favoritesDao.isFavorite(crypto.getSymbol())) {
+            Toast.makeText(getContext(), 
+                crypto.getName() + " ya está en favoritos", 
+                Toast.LENGTH_SHORT).show();
+            return;
         }
         
-        if (TextUtils.isEmpty(price)) {
-            Toast.makeText(getContext(), "El precio es requerido", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+        // Crear FavoriteItem desde CryptoItem
+        FavoriteItem favoriteItem = new FavoriteItem(
+            crypto.getSymbol(),
+            crypto.getName(),
+            crypto.getCurrentPrice(),
+            crypto.getImageUrl(),
+            false // no está pinned por defecto
+        );
         
-        return true;
-    }
-
-    /**
-     * Agrega un nuevo favorito a la base de datos
-     */
-    private void addFavorite(String name, double price, String iconUrl) {
-        FavoriteItem favorite = new FavoriteItem();
-        favorite.setName(name);
-        favorite.setPrice(price);
-        favorite.setIconUrl(iconUrl.isEmpty() ? null : iconUrl);
-        favorite.setPinned(false);
-        
-        long result = favoritesDao.insertFavorite(favorite);
+        // Insertar en la base de datos
+        long result = favoritesDao.insertFavorite(favoriteItem);
         if (result != -1) {
-            Toast.makeText(getContext(), "Favorito agregado", Toast.LENGTH_SHORT).show();
-            loadFavorites();
+            Toast.makeText(getContext(), 
+                crypto.getName() + " agregado a favoritos", 
+                Toast.LENGTH_SHORT).show();
+            loadFavorites(); // Recargar la lista
         } else {
-            Toast.makeText(getContext(), "Error al agregar favorito", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), 
+                "Error al agregar " + crypto.getName() + " a favoritos", 
+                Toast.LENGTH_SHORT).show();
         }
     }
 
