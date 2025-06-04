@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">AL1N</string>
+    
+    <!-- Login/Register strings -->
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="register_title">Crear Cuenta</string>
+    <string name="username_hint">Usuario</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="confirm_password_hint">Confirmar Contraseña</string>
+    <string name="keep_session">Mantener sesión</string>
+    <string name="login_button">Iniciar Sesión</string>
+    <string name="register_button">Registrarse</string>
+    <string name="go_to_register">¿No tienes cuenta? Regístrate</string>
+    <string name="back_to_login">¿Ya tienes cuenta? Inicia sesión</string>
+    
+    <!-- Main Activity strings -->
+    <string name="welcome_message">Bienvenido, %1$s</string>
+    <string name="logout_button">Salir</string>
+    
+    <!-- Notification strings -->
+    <string name="notification_login">Nuevo inicio de sesión</string>
+    <string name="notification_logout">Sesión cerrada</string>
+    
+    <!-- Error messages -->
+    <string name="error_empty_fields">Por favor, completa todos los campos</string>
+    <string name="error_invalid_credentials">Usuario o contraseña incorrectos</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
+    <string name="error_password_too_short">La contraseña debe tener al menos 4 caracteres</string>
+    <string name="error_user_exists">El usuario ya existe</string>
+    <string name="success_user_registered">Usuario registrado exitosamente</string>
+    <string name="error_registration_failed">Error al registrar usuario</string>
 </resources>
