@@ -29,4 +29,32 @@
     <string name="error_user_exists">El usuario ya existe</string>
     <string name="success_user_registered">Usuario registrado exitosamente</string>
     <string name="error_registration_failed">Error al registrar usuario</string>
+    
+    <!-- Navigation strings -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_favorites">Favoritos</string>
+    <string name="nav_profile">Perfil</string>
+    
+    <!-- Crypto strings -->
+    <string name="add_to_favorites">Agregar a favoritos</string>
+    <string name="remove_from_favorites">Quitar de favoritos</string>
+    <string name="crypto_list_title">Criptomonedas</string>
+    <string name="crypto_price_format">$%1$s</string>
+    <string name="crypto_change_positive">+%1$s%%</string>
+    <string name="crypto_change_negative">%1$s%%</string>
+    
+    <!-- Profile strings -->
+    <string name="change_password">Cambiar Contraseña</string>
+    <string name="logout">Cerrar Sesión</string>
+    
+    <!-- Favorites strings -->
+    <string name="empty_favorites">No tienes favoritos aún</string>
+    <string name="add_favorite">Agregar Favorito</string>
+    
+    <!-- Crypto Detail strings -->
+    <string name="share_crypto">Compartir información</string>
+    <string name="rank_label">Ranking:</string>
+    <string name="market_stats_title">Estadísticas de Mercado</string>
+    <string name="market_cap_label">Capitalización de Mercado</string>
+    <string name="volume_24h_label">Volumen 24h</string>
 </resources>

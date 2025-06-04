@@ -17,8 +17,7 @@
         android:theme="@style/Theme.AL1N"
         tools:targetApi="31">        <activity
             android:name=".MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false">        </activity>
         <!-- LoginActivity será la actividad principal de lanzamiento -->
         <activity
             android:name=".LoginActivity"
@@ -32,6 +31,12 @@
         <activity
             android:name=".RegisterActivity"
             android:exported="false">
+        </activity>
+        <!-- CryptoDetailActivity para mostrar detalles de criptomonedas -->
+        <activity
+            android:name=".CryptoDetailActivity"
+            android:exported="false"
+            android:parentActivityName=".MainActivity">
         </activity>
     </application>
 

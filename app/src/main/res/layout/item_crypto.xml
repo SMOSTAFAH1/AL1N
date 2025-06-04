@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Icono de la criptomoneda (placeholder) -->
+        <ImageView
+            android:id="@+id/ivCryptoIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_currency_bitcoin"
+            android:background="@drawable/circle_background"
+            android:padding="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/ic_currency_bitcoin" />
+
+        <!-- Contenedor para nombre y símbolo -->
+        <LinearLayout
+            android:id="@+id/llCryptoInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@id/ivCryptoIcon"
+            app:layout_constraintTop_toTopOf="@id/ivCryptoIcon"
+            app:layout_constraintBottom_toBottomOf="@id/ivCryptoIcon"
+            app:layout_constraintEnd_toStartOf="@id/llPriceInfo">
+
+            <!-- Nombre de la criptomoneda -->
+            <TextView
+                android:id="@+id/tvCryptoName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Bitcoin" />
+
+            <!-- Símbolo de la criptomoneda -->
+            <TextView
+                android:id="@+id/tvCryptoSymbol"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/dark_gray"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="BTC" />
+
+        </LinearLayout>
+
+        <!-- Contenedor para precio y cambio -->
+        <LinearLayout
+            android:id="@+id/llPriceInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="end"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/ivCryptoIcon"
+            app:layout_constraintBottom_toBottomOf="@id/ivCryptoIcon">
+
+            <!-- Precio actual -->
+            <TextView
+                android:id="@+id/tvCryptoPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:maxLines="1"
+                tools:text="$45,234.56" />
+
+            <!-- Cambio de precio 24h -->
+            <TextView
+                android:id="@+id/tvCryptoPriceChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                tools:text="+2.45%"
+                tools:textColor="@color/green" />
+
+        </LinearLayout>
+
+        <!-- Botón para agregar/quitar de favoritos -->
+        <ImageButton
+            android:id="@+id/btnFavorite"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_favorite_border"
+            android:contentDescription="@string/add_to_favorites"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/llPriceInfo"
+            android:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>
