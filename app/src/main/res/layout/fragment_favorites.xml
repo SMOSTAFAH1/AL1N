@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.FavoritesFragment">
+
+    <!-- Contenido principal -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <!-- Título del fragment -->
+        <TextView
+            android:id="@+id/tvFavoritesTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Favoritos"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="32dp" />
+
+        <!-- Mensaje temporal (será reemplazado por RecyclerView en Paso 4) -->
+        <TextView
+            android:id="@+id/tvFavoritesContent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tus cryptos favoritos aparecerán aquí.\nUsa el botón + para agregar."
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            app:layout_constraintTop_toBottomOf="@id/tvFavoritesTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- FloatingActionButton para agregar favoritos -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:contentDescription="Agregar favorito"
+        android:src="@drawable/ic_add"
+        app:tint="@color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

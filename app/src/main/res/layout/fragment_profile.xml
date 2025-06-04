@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    tools:context=".fragments.ProfileFragment">
+
+    <!-- Título del fragment -->
+    <TextView
+        android:id="@+id/tvProfileTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Perfil"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp" />
+
+    <!-- Información del usuario -->
+    <TextView
+        android:id="@+id/tvUserInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usuario: "
+        android:textSize="18sp"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toBottomOf="@id/tvProfileTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" />
+
+    <!-- Botón cambiar contraseña -->
+    <Button
+        android:id="@+id/btnChangePassword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cambiar contraseña"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tvUserInfo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="60dp" />
+
+    <!-- Botón cerrar sesión -->
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cerrar sesión"
+        android:textSize="16sp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:layout_constraintTop_toBottomOf="@id/btnChangePassword"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
