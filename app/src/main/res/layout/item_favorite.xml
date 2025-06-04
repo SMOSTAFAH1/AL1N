@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">        <!-- Icono de la criptomoneda -->
+        <ImageView
+            android:id="@+id/ivCryptoIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_circle_placeholder"
+            android:background="@drawable/circle_background"
+            android:padding="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:src="@drawable/ic_currency_bitcoin" /><!-- Indicador de pinned -->
+        <ImageView
+            android:id="@+id/ivPinIndicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_push_pin"
+            android:visibility="gone"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintStart_toStartOf="@id/ivCryptoIcon"
+            app:layout_constraintTop_toTopOf="@id/ivCryptoIcon"
+            tools:visibility="visible" />        <!-- Nombre de la criptomoneda -->
+        <TextView
+            android:id="@+id/tvCryptoName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="Bitcoin"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:maxLines="1"
+            android:ellipsize="end"
+            app:layout_constraintStart_toEndOf="@id/ivCryptoIcon"
+            app:layout_constraintEnd_toStartOf="@id/linearLayoutPrice"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/tvFavoriteCreated"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Bitcoin" />
+
+        <!-- Fecha de creación -->
+        <TextView
+            android:id="@+id/tvFavoriteCreated"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="4dp"
+            android:text="Agregado hoy"
+            android:textSize="12sp"
+            android:textColor="@color/dark_gray"
+            android:maxLines="1"            app:layout_constraintStart_toEndOf="@id/ivCryptoIcon"
+            app:layout_constraintEnd_toStartOf="@id/linearLayoutPrice"
+            app:layout_constraintTop_toBottomOf="@id/tvCryptoName"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Agregado hace 2 horas" />
+
+        <!-- Layout para precio y acciones -->
+        <LinearLayout
+            android:id="@+id/linearLayoutPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">            <!-- Precio -->
+            <TextView
+                android:id="@+id/tvCryptoPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$67,234.50"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/green"
+                android:gravity="end"
+                tools:text="$67,234.50" />
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">                <!-- Botón pin/unpin -->
+                <ImageButton
+                    android:id="@+id/btnTogglePin"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_push_pin_outline"
+                    android:padding="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="Pin/Unpin favorito"
+                    tools:src="@drawable/ic_push_pin" />
+
+                <!-- Botón compartir -->
+                <ImageButton
+                    android:id="@+id/ivShareButton"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="?android:attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_share"
+                    android:padding="4dp"
+                    android:contentDescription="Compartir favorito" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

@@ -24,21 +24,33 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="32dp" />
-
-        <!-- Mensaje temporal (será reemplazado por RecyclerView en Paso 4) -->
-        <TextView
-            android:id="@+id/tvFavoritesContent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tus cryptos favoritos aparecerán aquí.\nUsa el botón + para agregar."
-            android:textSize="16sp"
-            android:textAlignment="center"
-            android:textColor="@color/black"
+            android:layout_marginTop="32dp" />        <!-- RecyclerView para mostrar favoritos -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFavorites"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/tvFavoritesTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
+
+        <!-- Mensaje para cuando no hay favoritos -->
+        <TextView
+            android:id="@+id/tvEmptyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No tienes cryptos favoritos.\nUsa el botón + para agregar."
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:textColor="@color/gray"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="@id/rvFavorites"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/rvFavorites" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -9,4 +9,5 @@
     <color name="red">#FFF44336</color>
     <color name="light_orange">#FFFFA726</color>
     <color name="light_blue">#FF42A5F5</color>
+    <color name="primary_color">#FF2196F3</color>
 </resources>

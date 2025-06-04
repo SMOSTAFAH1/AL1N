@@ -1,29 +1,52 @@
 package com.grupo1.al1n.fragments;
 
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.grupo1.al1n.R;
+import com.grupo1.al1n.adapters.FavoriteAdapter;
+import com.grupo1.al1n.database.FavoritesDao;
+import com.grupo1.al1n.database.FavoritesDbHelper;
+import com.grupo1.al1n.models.FavoriteItem;
+
+import java.util.List;
 
 /**
  * Fragment para mostrar y gestionar cryptos favoritos
- * En el Paso 4 se implementará la funcionalidad completa con SQLite y RecyclerView
+ * Implementa funcionalidad completa con SQLite, swipe gestures y compartir
  */
-public class FavoritesFragment extends Fragment {
+public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFavoriteInteractionListener {
 
     // Componentes de la UI
     private TextView tvFavoritesTitle;
-    private TextView tvFavoritesContent;
+    private RecyclerView rvFavorites;
+    private TextView tvEmptyMessage;
     private FloatingActionButton fabAddFavorite;
+
+    // Componentes de datos
+    private FavoritesDao favoritesDao;
+    private FavoriteAdapter favoriteAdapter;
 
     /**
      * Constructor vacío requerido
@@ -51,14 +74,25 @@ public class FavoritesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
+        // Inicializar componentes de datos
+        initializeData();
+        
         // Inicializar componentes de la UI
         initializeComponents(view);
+        
+        // Configurar RecyclerView
+        setupRecyclerView();
         
         // Configurar listeners
         setupListeners();
         
-        // Configurar UI inicial
-        setupUI();
+        // Cargar favoritos
+        loadFavorites();
+    }    /**
+     * Inicializa los componentes de datos
+     */
+    private void initializeData() {
+        favoritesDao = new FavoritesDao(getContext());
     }
 
     /**
@@ -67,8 +101,113 @@ public class FavoritesFragment extends Fragment {
      */
     private void initializeComponents(View view) {
         tvFavoritesTitle = view.findViewById(R.id.tvFavoritesTitle);
-        tvFavoritesContent = view.findViewById(R.id.tvFavoritesContent);
+        rvFavorites = view.findViewById(R.id.rvFavorites);
+        tvEmptyMessage = view.findViewById(R.id.tvEmptyMessage);
         fabAddFavorite = view.findViewById(R.id.fabAddFavorite);
+    }
+
+    /**
+     * Configura el RecyclerView con su adapter y layout manager
+     */
+    private void setupRecyclerView() {
+        favoriteAdapter = new FavoriteAdapter(getContext(), null, this);
+        rvFavorites.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvFavorites.setAdapter(favoriteAdapter);
+        
+        // Configurar ItemTouchHelper para swipe gestures
+        setupSwipeGestures();
+    }
+
+    /**
+     * Configura los gestos de swipe (izquierda=eliminar, derecha=pin)
+     */
+    private void setupSwipeGestures() {
+        ItemTouchHelper.SimpleCallback swipeCallback = new ItemTouchHelper.SimpleCallback(0, 
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, 
+                                @NonNull RecyclerView.ViewHolder target) {
+                return false; // No implementamos drag & drop
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                FavoriteItem favorite = favoriteAdapter.getItem(position);
+                
+                if (favorite != null) {
+                    if (direction == ItemTouchHelper.LEFT) {
+                        // Swipe izquierda: eliminar
+                        deleteFavorite(favorite, position);
+                    } else if (direction == ItemTouchHelper.RIGHT) {
+                        // Swipe derecha: toggle pin
+                        togglePin(favorite, position);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, 
+                                  @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, 
+                                  int actionState, boolean isCurrentlyActive) {
+                
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+                    
+                    if (dX > 0) {
+                        // Swipe derecha: pin
+                        drawSwipeBackground(c, itemView, dX, Color.parseColor("#4CAF50"), 
+                                          R.drawable.ic_push_pin, true);
+                    } else if (dX < 0) {
+                        // Swipe izquierda: eliminar
+                        drawSwipeBackground(c, itemView, dX, Color.parseColor("#F44336"), 
+                                          R.drawable.ic_delete, false);
+                    }
+                }
+                
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeCallback);
+        itemTouchHelper.attachToRecyclerView(rvFavorites);
+    }
+
+    /**
+     * Dibuja el fondo del swipe con icono
+     */
+    private void drawSwipeBackground(Canvas c, View itemView, float dX, int backgroundColor, 
+                                   int iconResId, boolean isRightSwipe) {
+        ColorDrawable background = new ColorDrawable(backgroundColor);
+        
+        if (isRightSwipe) {
+            background.setBounds(itemView.getLeft(), itemView.getTop(), 
+                               itemView.getLeft() + (int) dX, itemView.getBottom());
+        } else {
+            background.setBounds(itemView.getRight() + (int) dX, itemView.getTop(), 
+                               itemView.getRight(), itemView.getBottom());
+        }
+        background.draw(c);
+        
+        // Dibujar icono
+        Drawable icon = ContextCompat.getDrawable(getContext(), iconResId);
+        if (icon != null) {
+            int iconMargin = (itemView.getHeight() - icon.getIntrinsicHeight()) / 2;
+            int iconTop = itemView.getTop() + iconMargin;
+            int iconBottom = iconTop + icon.getIntrinsicHeight();
+            
+            if (isRightSwipe) {
+                int iconLeft = itemView.getLeft() + iconMargin;
+                int iconRight = iconLeft + icon.getIntrinsicWidth();
+                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+            } else {
+                int iconRight = itemView.getRight() - iconMargin;
+                int iconLeft = iconRight - icon.getIntrinsicWidth();
+                icon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+            }
+            icon.draw(c);
+        }
     }
 
     /**
@@ -79,26 +218,158 @@ public class FavoritesFragment extends Fragment {
         fabAddFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Por ahora solo mostramos un Toast
-                // En el Paso 4 se implementará:
-                // - AlertDialog para agregar crypto
-                // - Validación de entrada
-                // - Inserción en base de datos SQLite
-                Toast.makeText(getContext(), "Próximamente: Agregar crypto favorito", Toast.LENGTH_SHORT).show();
+                showAddFavoriteDialog();
             }
         });
     }
 
     /**
-     * Configura la UI inicial del fragment
+     * Muestra el dialog para agregar un favorito
      */
-    private void setupUI() {
-        // Por ahora solo mostramos el mensaje placeholder
-        // En el Paso 4 se implementará:
-        // - Base de datos SQLite (FavoritesDbHelper)
-        // - RecyclerView con adapter personalizado
-        // - ItemTouchHelper para swipe gestures
-        // - Funcionalidad de pinear/despinear
-        // - Eliminación por swipe
+    private void showAddFavoriteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Agregar Crypto Favorito");
+        
+        // Crear layout del dialog
+        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_favorite, null);
+        EditText etCryptoName = dialogView.findViewById(R.id.etCryptoName);
+        EditText etCryptoPrice = dialogView.findViewById(R.id.etCryptoPrice);
+        EditText etCryptoIcon = dialogView.findViewById(R.id.etCryptoIcon);
+        
+        builder.setView(dialogView);
+        
+        builder.setPositiveButton("Agregar", (dialog, which) -> {
+            String name = etCryptoName.getText().toString().trim();
+            String priceStr = etCryptoPrice.getText().toString().trim();
+            String iconUrl = etCryptoIcon.getText().toString().trim();
+            
+            if (validateInput(name, priceStr)) {
+                try {
+                    double price = Double.parseDouble(priceStr);
+                    addFavorite(name, price, iconUrl);
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getContext(), "Precio inválido", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    /**
+     * Valida la entrada del usuario
+     */
+    private boolean validateInput(String name, String price) {
+        if (TextUtils.isEmpty(name)) {
+            Toast.makeText(getContext(), "El nombre es requerido", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+        if (TextUtils.isEmpty(price)) {
+            Toast.makeText(getContext(), "El precio es requerido", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        
+        return true;
+    }
+
+    /**
+     * Agrega un nuevo favorito a la base de datos
+     */
+    private void addFavorite(String name, double price, String iconUrl) {
+        FavoriteItem favorite = new FavoriteItem();
+        favorite.setName(name);
+        favorite.setPrice(price);
+        favorite.setIconUrl(iconUrl.isEmpty() ? null : iconUrl);
+        favorite.setPinned(false);
+        
+        long result = favoritesDao.insertFavorite(favorite);
+        if (result != -1) {
+            Toast.makeText(getContext(), "Favorito agregado", Toast.LENGTH_SHORT).show();
+            loadFavorites();
+        } else {
+            Toast.makeText(getContext(), "Error al agregar favorito", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Carga los favoritos desde la base de datos
+     */
+    private void loadFavorites() {
+        List<FavoriteItem> favorites = favoritesDao.getAllFavorites();
+        favoriteAdapter.updateFavorites(favorites);
+        
+        // Mostrar/ocultar mensaje vacío
+        if (favorites.isEmpty()) {
+            rvFavorites.setVisibility(View.GONE);
+            tvEmptyMessage.setVisibility(View.VISIBLE);
+        } else {
+            rvFavorites.setVisibility(View.VISIBLE);
+            tvEmptyMessage.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * Elimina un favorito
+     */
+    private void deleteFavorite(FavoriteItem favorite, int position) {
+        int result = favoritesDao.deleteFavorite(favorite.getId());
+        if (result > 0) {
+            favoriteAdapter.removeItem(position);
+            Toast.makeText(getContext(), "Favorito eliminado", Toast.LENGTH_SHORT).show();
+            
+            // Verificar si la lista está vacía
+            if (favoriteAdapter.getItemCount() == 0) {
+                rvFavorites.setVisibility(View.GONE);
+                tvEmptyMessage.setVisibility(View.VISIBLE);
+            }
+        } else {
+            Toast.makeText(getContext(), "Error al eliminar", Toast.LENGTH_SHORT).show();
+            favoriteAdapter.notifyItemChanged(position); // Restaurar item
+        }
+    }
+
+    /**
+     * Toggle del estado de pin
+     */
+    private void togglePin(FavoriteItem favorite, int position) {
+        favorite.setPinned(!favorite.isPinned());
+        int result = favoritesDao.updateFavorite(favorite);
+        
+        if (result > 0) {
+            // Recargar lista para reordenar (pinned first)
+            loadFavorites();
+            String message = favorite.isPinned() ? "Crypto fijado" : "Crypto desfijado";
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Error al actualizar", Toast.LENGTH_SHORT).show();
+            favoriteAdapter.notifyItemChanged(position); // Restaurar item
+        }
+    }
+
+    // Implementación de FavoriteAdapter.OnFavoriteInteractionListener
+
+    @Override
+    public void onPinToggle(FavoriteItem favoriteItem, int position) {
+        togglePin(favoriteItem, position);
+    }
+
+    @Override
+    public void onShare(FavoriteItem favoriteItem) {
+        String shareText = String.format("¡Mira esta crypto! %s está a $%.2f", 
+                                        favoriteItem.getName(), favoriteItem.getPrice());
+        
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Crypto Favorito - AL1N");
+        
+        startActivity(Intent.createChooser(shareIntent, "Compartir crypto"));
+    }
+
+    @Override
+    public void onDelete(FavoriteItem favoriteItem, int position) {
+        deleteFavorite(favoriteItem, position);
     }
 }
