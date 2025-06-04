@@ -1,10 +1,12 @@
 package com.grupo1.al1n;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -13,9 +15,13 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class LoginActivity extends AppCompatActivity {
@@ -30,6 +36,9 @@ public class LoginActivity extends AppCompatActivity {
     // Canal de notificaciones
     private static final String CHANNEL_ID = "AL1N_Channel";
     private static final int NOTIFICATION_ID = 1;
+    
+    // Código de solicitud para permisos de notificación
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 123;
 
     // Componentes de la UI
     private TextInputEditText etUsername, etPassword;
@@ -50,6 +59,9 @@ public class LoginActivity extends AppCompatActivity {
         
         // Crear canal de notificaciones
         createNotificationChannel();
+        
+        // Verificar y solicitar permisos de notificación
+        checkNotificationPermission();
         
         // Verificar si el usuario ya tiene sesión iniciada
         checkExistingSession();
@@ -84,6 +96,22 @@ public class LoginActivity extends AppCompatActivity {
             
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+    
+    /**
+     * Verifica si la app tiene permisos para mostrar notificaciones
+     */
+    private void checkNotificationPermission() {
+        // Para Android 13 (API 33) y superior, es necesario solicitar el permiso POST_NOTIFICATIONS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, 
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Solicitar el permiso si no está concedido
+                ActivityCompat.requestPermissions(this, 
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 
+                        NOTIFICATION_PERMISSION_REQUEST_CODE);
+            }
         }
     }
 
@@ -139,6 +167,11 @@ public class LoginActivity extends AppCompatActivity {
         if (validateCredentials(username, password)) {
             // Login exitoso
             saveLoginSession(username, password, cbKeepSession.isChecked());
+            
+            // Mostrar Snackbar de sesión iniciada
+            View rootView = findViewById(android.R.id.content);
+            Snackbar.make(rootView, "Sesión iniciada", Snackbar.LENGTH_LONG).show();
+            
             sendLoginNotification();
             startMainActivity();
         } else {
@@ -194,6 +227,20 @@ public class LoginActivity extends AppCompatActivity {
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido, no necesitamos hacer nada ahora
+                Toast.makeText(this, "Permiso de notificaciones concedido", Toast.LENGTH_SHORT).show();
+            } else {
+                // Permiso denegado
+                Toast.makeText(this, "Las notificaciones están desactivadas", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     /**

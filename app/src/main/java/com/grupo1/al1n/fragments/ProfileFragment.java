@@ -1,10 +1,12 @@
 package com.grupo1.al1n.fragments;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,9 +18,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.grupo1.al1n.LoginActivity;
 import com.grupo1.al1n.R;
 
@@ -37,6 +42,9 @@ public class ProfileFragment extends Fragment {
     // Canal de notificaciones
     private static final String CHANNEL_ID = "AL1N_Channel";
     private static final int NOTIFICATION_ID = 3;
+    
+    // Código de solicitud para permisos de notificación
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 123;
 
     // Componentes de la UI
     private TextView tvProfileTitle;
@@ -79,6 +87,9 @@ public class ProfileFragment extends Fragment {
         // Crear canal de notificaciones
         createNotificationChannel();
         
+        // Verificar y solicitar permisos de notificación
+        checkNotificationPermission();
+        
         // Configurar listeners
         setupListeners();
         
@@ -112,6 +123,22 @@ public class ProfileFragment extends Fragment {
             
             NotificationManager notificationManager = requireContext().getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+        }
+    }
+    
+    /**
+     * Verifica si la app tiene permisos para mostrar notificaciones
+     */
+    private void checkNotificationPermission() {
+        // Para Android 13 (API 33) y superior, es necesario solicitar el permiso POST_NOTIFICATIONS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), 
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                // Solicitar el permiso si no está concedido
+                ActivityCompat.requestPermissions(requireActivity(), 
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 
+                        NOTIFICATION_PERMISSION_REQUEST_CODE);
+            }
         }
     }
 
@@ -161,6 +188,15 @@ public class ProfileFragment extends Fragment {
         editor.putBoolean(KEY_KEEP_SESSION, false);
         editor.apply();
         
+        // Mostrar un Snackbar para el cierre de sesión
+        View rootView = getView();
+        if (rootView != null) {
+            Snackbar.make(rootView, "Sesión cerrada", Snackbar.LENGTH_LONG).show();
+        } else {
+            // Si no hay vista raíz, usar Toast como fallback
+            Toast.makeText(requireContext(), "Sesión cerrada", Toast.LENGTH_LONG).show();
+        }
+        
         // Enviar notificación de sesión cerrada
         sendLogoutNotification();
         
@@ -183,5 +219,20 @@ public class ProfileFragment extends Fragment {
 
         NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NOTIFICATION_ID, builder.build());
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido, no necesitamos hacer nada ahora
+                Toast.makeText(requireContext(), "Permiso de notificaciones concedido", Toast.LENGTH_SHORT).show();
+            } else {
+                // Permiso denegado
+                Toast.makeText(requireContext(), "Las notificaciones están desactivadas", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }
