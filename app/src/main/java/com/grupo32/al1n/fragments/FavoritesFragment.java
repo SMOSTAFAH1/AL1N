@@ -1,4 +1,4 @@
-package com.grupo1.al1n.fragments;
+package com.grupo32.al1n.fragments;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -25,13 +25,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.grupo1.al1n.R;
-import com.grupo1.al1n.adapters.FavoriteAdapter;
-import com.grupo1.al1n.adapters.CryptoSearchAdapter;
-import com.grupo1.al1n.database.FavoritesDao;
-import com.grupo1.al1n.models.FavoriteItem;
-import com.grupo1.al1n.models.CryptoItem;
-import com.grupo1.al1n.utils.CryptoDataHolder;
+import com.grupo32.al1n.R;
+import com.grupo32.al1n.CryptoDetailActivity;
+import com.grupo32.al1n.adapters.FavoriteAdapter;
+import com.grupo32.al1n.adapters.CryptoSearchAdapter;
+import com.grupo32.al1n.database.FavoritesDao;
+import com.grupo32.al1n.models.FavoriteItem;
+import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.utils.CryptoDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -405,10 +406,27 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
         shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Crypto Favorito - AL1N");
         
         startActivity(Intent.createChooser(shareIntent, "Compartir crypto"));
+    }    @Override
+    public void onDelete(FavoriteItem favoriteItem, int position) {
+        deleteFavorite(favoriteItem, position);
     }
 
     @Override
-    public void onDelete(FavoriteItem favoriteItem, int position) {
-        deleteFavorite(favoriteItem, position);
+    public void onItemClick(FavoriteItem favoriteItem) {
+        // Crear Intent para abrir CryptoDetailActivity
+        Intent intent = new Intent(getContext(), CryptoDetailActivity.class);
+        
+        // Pasar los datos disponibles del favorito
+        intent.putExtra("crypto_symbol", favoriteItem.getSymbol());
+        intent.putExtra("crypto_name", favoriteItem.getName());
+        intent.putExtra("crypto_price", favoriteItem.getPrice());
+        
+        // Para los campos que no están en FavoriteItem, usar valores por defecto
+        intent.putExtra("crypto_change", 0.0); // No tenemos el cambio de precio en favoritos
+        intent.putExtra("crypto_market_cap", 0.0); // No tenemos market cap en favoritos  
+        intent.putExtra("crypto_volume", 0.0); // No tenemos volumen en favoritos
+        intent.putExtra("crypto_rank", 0); // No tenemos rank en favoritos
+        
+        startActivity(intent);
     }
 }

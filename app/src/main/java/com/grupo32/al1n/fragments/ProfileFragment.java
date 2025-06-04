@@ -1,4 +1,4 @@
-package com.grupo1.al1n.fragments;
+package com.grupo32.al1n.fragments;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -29,8 +29,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.grupo1.al1n.LoginActivity;
-import com.grupo1.al1n.R;
+import com.grupo32.al1n.LoginActivity;
+import com.grupo32.al1n.R;
 
 import java.util.HashSet;
 import java.util.Set;

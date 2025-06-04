@@ -1,4 +1,4 @@
-package com.grupo1.al1n;
+package com.grupo32.al1n;
 
 import android.Manifest;
 import android.app.AlertDialog;

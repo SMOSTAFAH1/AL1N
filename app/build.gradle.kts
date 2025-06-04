@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.grupo1.al1n"
+    namespace = "com.grupo32.al1n"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.grupo1.al1n"
+        applicationId = "com.grupo32.al1n"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -46,6 +46,9 @@ dependencies {
     
     // Para cargar imágenes
     implementation("com.github.bumptech.glide:glide:4.15.1")
+    
+    // Para gráficos de trading
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

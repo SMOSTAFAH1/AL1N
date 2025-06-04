@@ -32,9 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Card con información principal -->
+            android:padding="16dp">            <!-- Card con información principal -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -170,11 +168,181 @@
 
                     </LinearLayout>
 
+                </LinearLayout>            </androidx.cardview.widget.CardView>
+
+            <!-- Card con gráfico de precio -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Header del gráfico -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Price Chart"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black" />
+
+                        <!-- Botones de timeframe -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/btn_1d"
+                                android:layout_width="40dp"
+                                android:layout_height="32dp"
+                                android:text="1D"
+                                android:textSize="12sp"
+                                android:textAllCaps="false"
+                                android:background="@drawable/circle_background"
+                                android:layout_marginEnd="8dp"
+                                style="@style/Widget.Material3.Button.TextButton" />
+
+                            <Button
+                                android:id="@+id/btn_7d"
+                                android:layout_width="40dp"
+                                android:layout_height="32dp"
+                                android:text="7D"
+                                android:textSize="12sp"
+                                android:textAllCaps="false"
+                                android:backgroundTint="@color/light_blue"
+                                android:textColor="@color/white"
+                                android:layout_marginEnd="8dp"
+                                style="@style/Widget.Material3.Button" />
+
+                            <Button
+                                android:id="@+id/btn_30d"
+                                android:layout_width="40dp"
+                                android:layout_height="32dp"
+                                android:text="30D"
+                                android:textSize="12sp"
+                                android:textAllCaps="false"
+                                android:background="@drawable/circle_background"
+                                style="@style/Widget.Material3.Button.TextButton" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Gráfico de líneas -->
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/price_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Información adicional del gráfico -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="24h High"
+                                android:textSize="12sp"
+                                android:textColor="@color/dark_gray" />
+
+                            <TextView
+                                android:id="@+id/tv_24h_high"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$105,500"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/green"
+                                tools:text="$105,500" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="24h Low"
+                                android:textSize="12sp"
+                                android:textColor="@color/dark_gray" />
+
+                            <TextView
+                                android:id="@+id/tv_24h_low"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$103,200"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/red"
+                                tools:text="$103,200" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="24h Volume"
+                                android:textSize="12sp"
+                                android:textColor="@color/dark_gray" />
+
+                            <TextView
+                                android:id="@+id/tv_24h_volume"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="2.5M BTC"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                tools:text="2.5M BTC" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Card con estadísticas de mercado -->
+            <!-- Card con estadísticas de mercado expandidas -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -221,13 +389,12 @@
                             android:textColor="@color/black"
                             tools:text="$1.32T" />
 
-                    </LinearLayout>
-
-                    <!-- Volume 24h -->
+                    </LinearLayout>                    <!-- Volume 24h -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
 
                         <TextView
                             android:layout_width="0dp"
@@ -246,6 +413,130 @@
                             android:textStyle="bold"
                             android:textColor="@color/black"
                             tools:text="$28.5B" />
+
+                    </LinearLayout>
+
+                    <!-- Circulating Supply -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Circulating Supply"
+                            android:textSize="16sp"
+                            android:textColor="@color/dark_gray" />
+
+                        <TextView
+                            android:id="@+id/tv_circulating_supply"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="19.8M BTC"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            tools:text="19.8M BTC" />
+
+                    </LinearLayout>
+
+                    <!-- Total Supply -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Total Supply"
+                            android:textSize="16sp"
+                            android:textColor="@color/dark_gray" />
+
+                        <TextView
+                            android:id="@+id/tv_total_supply"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="21M BTC"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            tools:text="21M BTC" />
+
+                    </LinearLayout>
+
+                    <!-- Max Supply -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Max Supply"
+                            android:textSize="16sp"
+                            android:textColor="@color/dark_gray" />
+
+                        <TextView
+                            android:id="@+id/tv_max_supply"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="21M BTC"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/black"
+                            tools:text="21M BTC" />
+
+                    </LinearLayout>
+
+                    <!-- All Time High -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="All Time High"
+                            android:textSize="16sp"
+                            android:textColor="@color/dark_gray" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="end">
+
+                            <TextView
+                                android:id="@+id/tv_all_time_high"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="$69,045"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="@color/black"
+                                tools:text="$69,045" />
+
+                            <TextView
+                                android:id="@+id/tv_ath_date"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nov 10, 2021"
+                                android:textSize="12sp"
+                                android:textColor="@color/dark_gray"
+                                tools:text="Nov 10, 2021" />
+
+                        </LinearLayout>
 
                     </LinearLayout>
 

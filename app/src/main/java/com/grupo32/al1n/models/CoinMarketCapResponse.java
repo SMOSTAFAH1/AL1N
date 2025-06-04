@@ -1,4 +1,4 @@
-package com.grupo1.al1n.models;
+package com.grupo32.al1n.models;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;

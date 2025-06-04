@@ -1,6 +1,6 @@
-package com.grupo1.al1n.services;
+package com.grupo32.al1n.services;
 
-import com.grupo1.al1n.models.CoinMarketCapResponse;
+import com.grupo32.al1n.models.CoinMarketCapResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;

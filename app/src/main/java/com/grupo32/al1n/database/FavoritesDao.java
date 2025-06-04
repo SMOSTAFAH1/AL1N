@@ -1,4 +1,4 @@
-package com.grupo1.al1n.database;
+package com.grupo32.al1n.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.grupo1.al1n.models.FavoriteItem;
+import com.grupo32.al1n.models.FavoriteItem;
 
 import java.util.ArrayList;
 import java.util.List;

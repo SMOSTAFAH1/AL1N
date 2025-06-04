@@ -1,4 +1,4 @@
-package com.grupo1.al1n.adapters;
+package com.grupo32.al1n.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.grupo1.al1n.R;
-import com.grupo1.al1n.models.FavoriteItem;
+import com.grupo32.al1n.R;
+import com.grupo32.al1n.models.FavoriteItem;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,15 +29,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
     private Context context;
     private List<FavoriteItem> favoritesList;
-    private OnFavoriteInteractionListener listener;
-
-    /**
+    private OnFavoriteInteractionListener listener;    /**
      * Interface para manejar interacciones con los elementos favoritos
      */
     public interface OnFavoriteInteractionListener {
         void onPinToggle(FavoriteItem favoriteItem, int position);
         void onShare(FavoriteItem favoriteItem);
         void onDelete(FavoriteItem favoriteItem, int position);
+        void onItemClick(FavoriteItem favoriteItem);
     }
 
     /**
@@ -143,6 +142,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
          * Configura los listeners del ViewHolder
          */
         private void setupListeners() {
+            // Click en el item completo para ver detalles
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && listener != null) {
+                        FavoriteItem favorite = favoritesList.get(position);
+                        listener.onItemClick(favorite);
+                    }
+                }
+            });
+
             // Click en pin para toggle (usando el botón específico)
             btnTogglePin.setOnClickListener(new View.OnClickListener() {
                 @Override

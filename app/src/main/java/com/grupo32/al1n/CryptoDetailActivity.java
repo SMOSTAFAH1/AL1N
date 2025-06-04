@@ -1,8 +1,9 @@
-package com.grupo1.al1n;
+package com.grupo32.al1n;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -10,19 +11,32 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.grupo32.al1n.models.PriceHistoryItem;
+import com.grupo32.al1n.utils.ChartUtils;
+
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Activity para mostrar los detalles de una criptomoneda
  * Incluye funcionalidad de compartir información
  */
-public class CryptoDetailActivity extends AppCompatActivity {
-
-    // Componentes de la UI
+public class CryptoDetailActivity extends AppCompatActivity {    // Componentes de la UI
     private TextView tvSymbol, tvName, tvPrice, tvPriceChange;
     private TextView tvMarketCap, tvVolume, tvRank;
+    private TextView tv24hHigh, tv24hLow, tv24hVolume;
+    private TextView tvCirculatingSupply, tvTotalSupply, tvMaxSupply;
+    private TextView tvAllTimeHigh, tvAthDate;
     private ImageButton btnShare, btnFavorite;
     private Toolbar toolbar;
+    
+    // Componentes del gráfico
+    private LineChart priceChart;
+    private Button btn1d, btn7d, btn30d;
 
     // Datos de la criptomoneda
     private String cryptoSymbol, cryptoName;
@@ -32,14 +46,14 @@ public class CryptoDetailActivity extends AppCompatActivity {
 
     // Formatter para números
     private DecimalFormat decimalFormat;
+    private SimpleDateFormat dateFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_crypto_detail);
-
-        // Inicializar formatter
+        setContentView(R.layout.activity_crypto_detail);        // Inicializar formatter
         decimalFormat = new DecimalFormat("#,##0.00");
+        dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
 
         // Obtener datos del intent
         getIntentData();
@@ -51,10 +65,14 @@ public class CryptoDetailActivity extends AppCompatActivity {
         setupToolbar();
 
         // Configurar UI
-        setupUI();
-
-        // Configurar listeners
+        setupUI();        // Configurar listeners
         setupListeners();
+        
+        // Configurar gráfico
+        setupChart();
+        
+        // Cargar datos del gráfico
+        loadChartData();
     }
 
     /**
@@ -70,9 +88,7 @@ public class CryptoDetailActivity extends AppCompatActivity {
         cryptoVolume = intent.getDoubleExtra("crypto_volume", 0.0);
         cryptoRank = intent.getIntExtra("crypto_rank", 0);
         isFavorite = false; // Por defecto, se implementará en Paso 4
-    }
-
-    /**
+    }    /**
      * Inicializa los componentes de la UI
      */
     private void initializeComponents() {
@@ -86,6 +102,22 @@ public class CryptoDetailActivity extends AppCompatActivity {
         tvRank = findViewById(R.id.tv_detail_rank);
         btnShare = findViewById(R.id.btn_detail_share);
         btnFavorite = findViewById(R.id.btn_detail_favorite);
+        
+        // Componentes del gráfico
+        priceChart = findViewById(R.id.price_chart);
+        btn1d = findViewById(R.id.btn_1d);
+        btn7d = findViewById(R.id.btn_7d);
+        btn30d = findViewById(R.id.btn_30d);
+        
+        // Componentes adicionales de información
+        tv24hHigh = findViewById(R.id.tv_24h_high);
+        tv24hLow = findViewById(R.id.tv_24h_low);
+        tv24hVolume = findViewById(R.id.tv_24h_volume);
+        tvCirculatingSupply = findViewById(R.id.tv_circulating_supply);
+        tvTotalSupply = findViewById(R.id.tv_total_supply);
+        tvMaxSupply = findViewById(R.id.tv_max_supply);
+        tvAllTimeHigh = findViewById(R.id.tv_all_time_high);
+        tvAthDate = findViewById(R.id.tv_ath_date);
     }
 
     /**
@@ -97,9 +129,7 @@ public class CryptoDetailActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle(cryptoSymbol + " Details");
         }
-    }
-
-    /**
+    }    /**
      * Configura la UI con los datos de la criptomoneda
      */
     private void setupUI() {
@@ -116,17 +146,53 @@ public class CryptoDetailActivity extends AppCompatActivity {
         tvVolume.setText("$" + formatLargeNumber(cryptoVolume));
         tvRank.setText("#" + cryptoRank);
         
+        // Configurar datos adicionales con valores de muestra
+        setupAdditionalData();
+        
         // Configurar botón de favorito
         int iconRes = isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
         btnFavorite.setImageResource(iconRes);
     }
 
     /**
+     * Configura datos adicionales de muestra para la pantalla
+     */
+    private void setupAdditionalData() {
+        // Calcular valores de muestra basados en el precio actual
+        double high24h = cryptoPrice * 1.05; // 5% más alto
+        double low24h = cryptoPrice * 0.95;  // 5% más bajo
+        
+        tv24hHigh.setText("$" + decimalFormat.format(high24h));
+        tv24hLow.setText("$" + decimalFormat.format(low24h));
+        tv24hVolume.setText(formatLargeNumber(cryptoVolume / 1000000) + " " + cryptoSymbol);
+        
+        // Datos de suministro de muestra (Bitcoin como ejemplo)
+        if (cryptoSymbol.equals("BTC")) {
+            tvCirculatingSupply.setText("19.8M BTC");
+            tvTotalSupply.setText("19.8M BTC");
+            tvMaxSupply.setText("21M BTC");
+            tvAllTimeHigh.setText("$69,045");
+            tvAthDate.setText("Nov 10, 2021");
+        } else {
+            // Valores genéricos para otras criptomonedas
+            double supply = cryptoMarketCap / cryptoPrice;
+            tvCirculatingSupply.setText(formatLargeNumber(supply) + " " + cryptoSymbol);
+            tvTotalSupply.setText(formatLargeNumber(supply * 1.1) + " " + cryptoSymbol);
+            tvMaxSupply.setText(formatLargeNumber(supply * 1.5) + " " + cryptoSymbol);
+            tvAllTimeHigh.setText("$" + decimalFormat.format(cryptoPrice * 2.5));
+            tvAthDate.setText(dateFormat.format(new Date(System.currentTimeMillis() - 365L * 24 * 60 * 60 * 1000)));
+        }
+    }    /**
      * Configura los listeners de los botones
      */
     private void setupListeners() {
         btnShare.setOnClickListener(v -> shareCryptoInfo());
         btnFavorite.setOnClickListener(v -> toggleFavorite());
+        
+        // Listeners para botones de timeframe del gráfico
+        btn1d.setOnClickListener(v -> loadChartData(1));
+        btn7d.setOnClickListener(v -> loadChartData(7));
+        btn30d.setOnClickListener(v -> loadChartData(30));
     }
 
     /**
@@ -169,8 +235,67 @@ public class CryptoDetailActivity extends AppCompatActivity {
         
         String message = isFavorite ? "Added to favorites" : "Removed from favorites";
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+          // TODO: Implementar persistencia en Paso 4 con SQLite
+    }
+
+    /**
+     * Configura el gráfico de precios
+     */
+    private void setupChart() {
+        ChartUtils.setupLineChart(priceChart);
+    }
+
+    /**
+     * Carga datos del gráfico con timeframe por defecto (7 días)
+     */
+    private void loadChartData() {
+        loadChartData(7);
+    }
+
+    /**
+     * Carga datos del gráfico para el timeframe especificado
+     */
+    private void loadChartData(int days) {
+        // Actualizar estado visual de los botones
+        updateTimeframeButtons(days);
         
-        // TODO: Implementar persistencia en Paso 4 con SQLite
+        // Generar datos de muestra para el gráfico
+        List<PriceHistoryItem> priceHistory = ChartUtils.generateSampleData(cryptoPrice, days);
+        
+        // Actualizar gráfico
+        ChartUtils.updateChartData(priceChart, priceHistory, cryptoChange >= 0);
+    }
+
+    /**
+     * Actualiza el estado visual de los botones de timeframe
+     */
+    private void updateTimeframeButtons(int selectedDays) {
+        // Resetear todos los botones
+        btn1d.setBackgroundResource(R.drawable.circle_background);
+        btn7d.setBackgroundResource(R.drawable.circle_background);
+        btn30d.setBackgroundResource(R.drawable.circle_background);
+        
+        btn1d.setTextColor(getResources().getColor(R.color.black));
+        btn7d.setTextColor(getResources().getColor(R.color.black));
+        btn30d.setTextColor(getResources().getColor(R.color.black));
+        
+        // Destacar botón seleccionado
+        Button selectedButton;
+        switch (selectedDays) {
+            case 1:
+                selectedButton = btn1d;
+                break;
+            case 30:
+                selectedButton = btn30d;
+                break;
+            case 7:
+            default:
+                selectedButton = btn7d;
+                break;
+        }
+        
+        selectedButton.setBackgroundTintList(getResources().getColorStateList(R.color.light_blue));
+        selectedButton.setTextColor(getResources().getColor(R.color.white));
     }
 
     /**

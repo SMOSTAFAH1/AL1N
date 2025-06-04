@@ -1,4 +1,4 @@
-package com.grupo1.al1n;
+package com.grupo32.al1n;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,9 +14,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.grupo1.al1n.fragments.FavoritesFragment;
-import com.grupo1.al1n.fragments.HomeFragment;
-import com.grupo1.al1n.fragments.ProfileFragment;
+import com.grupo32.al1n.fragments.FavoritesFragment;
+import com.grupo32.al1n.fragments.HomeFragment;
+import com.grupo32.al1n.fragments.ProfileFragment;
 
 public class MainActivity extends AppCompatActivity {
 

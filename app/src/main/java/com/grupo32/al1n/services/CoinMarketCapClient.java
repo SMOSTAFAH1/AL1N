@@ -1,4 +1,4 @@
-package com.grupo1.al1n.services;
+package com.grupo32.al1n.services;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;

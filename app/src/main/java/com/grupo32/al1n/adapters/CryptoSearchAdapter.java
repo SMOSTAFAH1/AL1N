@@ -1,4 +1,4 @@
-package com.grupo1.al1n.adapters;
+package com.grupo32.al1n.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,8 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.grupo1.al1n.R;
-import com.grupo1.al1n.models.CryptoItem;
+import com.grupo32.al1n.R;
+import com.grupo32.al1n.models.CryptoItem;
 
 import java.text.DecimalFormat;
 import java.util.List;

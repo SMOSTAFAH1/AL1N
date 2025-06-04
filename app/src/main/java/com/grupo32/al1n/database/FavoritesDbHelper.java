@@ -1,4 +1,4 @@
-package com.grupo1.al1n.database;
+package com.grupo32.al1n.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

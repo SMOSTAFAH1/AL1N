@@ -1,6 +1,6 @@
-package com.grupo1.al1n.utils;
+package com.grupo32.al1n.utils;
 
-import com.grupo1.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.CryptoItem;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.grupo1.al1n.adapters;
+package com.grupo32.al1n.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +12,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.grupo1.al1n.R;
-import com.grupo1.al1n.CryptoDetailActivity;
-import com.grupo1.al1n.models.CryptoItem;
-import com.grupo1.al1n.models.FavoriteItem;
-import com.grupo1.al1n.database.FavoritesDao;
+import com.grupo32.al1n.R;
+import com.grupo32.al1n.CryptoDetailActivity;
+import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.FavoriteItem;
+import com.grupo32.al1n.database.FavoritesDao;
 import com.bumptech.glide.Glide;
 import android.widget.Toast;
 

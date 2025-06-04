@@ -1,4 +1,4 @@
-package com.grupo1.al1n.fragments;
+package com.grupo32.al1n.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -13,14 +13,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.grupo1.al1n.R;
-import com.grupo1.al1n.adapters.CryptoAdapter;
-import com.grupo1.al1n.models.CryptoItem;
-import com.grupo1.al1n.models.CoinMarketCapResponse;
-import com.grupo1.al1n.services.CoinMarketCapClient;
-import com.grupo1.al1n.services.CoinMarketCapService;
-import com.grupo1.al1n.utils.CryptoDataMapper;
-import com.grupo1.al1n.utils.CryptoDataHolder;
+import com.grupo32.al1n.R;
+import com.grupo32.al1n.adapters.CryptoAdapter;
+import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.CoinMarketCapResponse;
+import com.grupo32.al1n.services.CoinMarketCapClient;
+import com.grupo32.al1n.services.CoinMarketCapService;
+import com.grupo32.al1n.utils.CryptoDataMapper;
+import com.grupo32.al1n.utils.CryptoDataHolder;
 
 import java.util.ArrayList;
 import java.util.List;
