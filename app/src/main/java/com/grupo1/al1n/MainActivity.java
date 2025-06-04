@@ -22,13 +22,14 @@ public class MainActivity extends AppCompatActivity {
 
     // Constantes para SharedPreferences
     private static final String PREFS_NAME = "AL1N_Prefs";
-    private static final String KEY_USERNAME = "username";
+    private static final String KEY_ACTIVE_USER = "active_user";
 
     // Componentes de la UI
     private BottomNavigationView bottomNavigationView;
 
     // SharedPreferences
     private SharedPreferences sharedPreferences;
+    private String activeUser;
 
     // Fragments
     private HomeFragment homeFragment;
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private void initializeComponents() {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        
+        // Obtener usuario activo
+        activeUser = sharedPreferences.getString(KEY_ACTIVE_USER, "default_user");
     }
 
     /**

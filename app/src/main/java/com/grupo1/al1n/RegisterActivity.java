@@ -13,12 +13,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class RegisterActivity extends AppCompatActivity {
 
     // Constantes para SharedPreferences
     private static final String PREFS_NAME = "AL1N_Prefs";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
+    private static final String KEY_ACTIVE_USER = "active_user";
+    private static final String KEY_USER_LIST = "user_list";
+    
+    // Máximo de cuentas permitidas
+    private static final int MAX_ACCOUNTS = 2;
 
     // Componentes de la UI
     private TextInputEditText etRegisterUsername, etRegisterPassword, etConfirmPassword;
@@ -126,8 +134,16 @@ public class RegisterActivity extends AppCompatActivity {
      * @return true si el usuario existe
      */
     private boolean userExists(String username) {
-        String storedUsername = sharedPreferences.getString(KEY_USERNAME, "");
-        return username.equals(storedUsername);
+        // Obtener lista de usuarios
+        Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
+        return userList.contains(username);
+    }
+
+    /**
+     * Genera una clave específica para cada usuario
+     */
+    private String getUserSpecificKey(String key, String username) {
+        return username + "_" + key;
     }
 
     /**
@@ -138,9 +154,33 @@ public class RegisterActivity extends AppCompatActivity {
      */
     private boolean saveNewUser(String username, String password) {
         try {
+            // Obtener lista de usuarios
+            Set<String> userList = new HashSet<>(
+                sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>()));
+            
+            // Verificar si se ha alcanzado el límite de cuentas
+            if (userList.size() >= MAX_ACCOUNTS) {
+                Toast.makeText(this, "Solo se permiten " + MAX_ACCOUNTS + " cuentas", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            
+            // Añadir nuevo usuario a la lista
+            userList.add(username);
+            
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(KEY_USERNAME, username);
-            editor.putString(KEY_PASSWORD, password);
+            
+            // Guardar lista actualizada de usuarios
+            editor.putStringSet(KEY_USER_LIST, userList);
+            
+            // Guardar datos específicos del usuario
+            editor.putString(getUserSpecificKey(KEY_USERNAME, username), username);
+            editor.putString(getUserSpecificKey(KEY_PASSWORD, username), password);
+            
+            // Establecer como usuario activo si es el primer usuario
+            if (userList.size() == 1) {
+                editor.putString(KEY_ACTIVE_USER, username);
+            }
+            
             editor.apply();
             return true;
         } catch (Exception e) {

@@ -270,16 +270,19 @@ public class LoginActivity extends AppCompatActivity {
         // Obtener lista de usuarios registrados
         Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
         
+        // Si no hay usuarios registrados, permitir cualquier login (modo demo)
+        if (userList.isEmpty()) {
+            // Guardar este usuario como el primero
+            saveLoginSession(username, password, cbKeepSession.isChecked());
+            return true;
+        }
+        
         // Verificar si el usuario existe en la lista
         if (!userList.contains(username)) {
-            // Si no hay usuarios registrados, cualquier combinación es válida
-            if (userList.isEmpty()) {
-                return true;
-            }
             return false;
         }
         
-        // Obtener credenciales almacenadas
+        // Obtener contraseña almacenada
         String storedPassword = sharedPreferences.getString(getUserSpecificKey(KEY_PASSWORD, username), "");
         
         // Verificar credenciales
