@@ -45,6 +45,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="60dp" />
+        
+    <!-- Botón cambiar cuenta -->
+    <Button
+        android:id="@+id/btnSwitchAccount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cambiar cuenta"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/btnChangePassword"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
     <!-- Botón cerrar sesión -->
     <Button
@@ -54,7 +66,7 @@
         android:text="Cerrar sesión"
         android:textSize="16sp"
         style="@style/Widget.Material3.Button.OutlinedButton"
-        app:layout_constraintTop_toBottomOf="@id/btnChangePassword"
+        app:layout_constraintTop_toBottomOf="@id/btnSwitchAccount"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

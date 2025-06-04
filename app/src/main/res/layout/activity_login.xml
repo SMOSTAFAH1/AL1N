@@ -81,6 +81,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp" />
+    
+    <!-- Botón para cambiar de cuenta -->
+    <Button
+        android:id="@+id/btnSwitchAccount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cambiar de cuenta"
+        android:textSize="16sp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:layout_constraintTop_toBottomOf="@id/btnLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
 
     <!-- Botón para ir a registro -->
     <TextView
@@ -91,7 +104,7 @@
         android:textColor="?attr/colorPrimary"
         android:clickable="true"
         android:focusable="true"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin"
+        app:layout_constraintTop_toBottomOf="@id/btnSwitchAccount"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp" />

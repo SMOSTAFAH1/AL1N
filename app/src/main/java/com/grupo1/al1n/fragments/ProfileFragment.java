@@ -32,6 +32,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.grupo1.al1n.LoginActivity;
 import com.grupo1.al1n.R;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Fragment para mostrar el perfil del usuario y configuraciones
  * Incluye funcionalidades de cambio de contraseña y cerrar sesión
@@ -44,6 +47,8 @@ public class ProfileFragment extends Fragment {
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
     private static final String KEY_KEEP_SESSION = "keep_session";
+    private static final String KEY_ACTIVE_USER = "active_user";
+    private static final String KEY_USER_LIST = "user_list";
     
     // Canal de notificaciones
     private static final String CHANNEL_ID = "AL1N_Channel";
@@ -58,9 +63,13 @@ public class ProfileFragment extends Fragment {
     private TextView tvUserInfo;
     private Button btnChangePassword;
     private Button btnLogout;
+    private Button btnSwitchAccount;
 
     // SharedPreferences
     private SharedPreferences sharedPreferences;
+    
+    // Usuario activo
+    private String activeUser;
 
     /**
      * Constructor vacío requerido
@@ -113,8 +122,21 @@ public class ProfileFragment extends Fragment {
         tvUserInfo = view.findViewById(R.id.tvUserInfo);
         btnChangePassword = view.findViewById(R.id.btnChangePassword);
         btnLogout = view.findViewById(R.id.btnLogout);
+        btnSwitchAccount = view.findViewById(R.id.btnSwitchAccount);
         
         sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        activeUser = sharedPreferences.getString(KEY_ACTIVE_USER, "");
+        
+        // Si no hay usuario activo y hay usuarios en la lista, establecer el primero como activo
+        if (activeUser.isEmpty()) {
+            Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
+            if (!userList.isEmpty()) {
+                activeUser = userList.iterator().next();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(KEY_ACTIVE_USER, activeUser);
+                editor.apply();
+            }
+        }
     }
 
     /**
@@ -168,15 +190,87 @@ public class ProfileFragment extends Fragment {
                 performLogout();
             }
         });
+        
+        // Listener del botón cambiar cuenta (si existe)
+        if (btnSwitchAccount != null) {
+            btnSwitchAccount.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showSwitchAccountDialog();
+                }
+            });
+        }
     }
 
     /**
      * Configura la UI inicial del fragment
      */
     private void setupUI() {
+        // Si no hay usuario activo, mostrar mensaje genérico
+        if (activeUser.isEmpty()) {
+            tvUserInfo.setText("Usuario: Invitado");
+            return;
+        }
+        
         // Obtener nombre de usuario de SharedPreferences
-        String username = sharedPreferences.getString(KEY_USERNAME, "Usuario");
-        tvUserInfo.setText("Usuario: " + username);
+        tvUserInfo.setText("Usuario: " + activeUser);
+    }
+    
+    /**
+     * Muestra el diálogo para cambiar de cuenta
+     */
+    private void showSwitchAccountDialog() {
+        Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
+        
+        // Filtrar para no mostrar el usuario actual
+        Set<String> otherUsers = new HashSet<>();
+        for (String user : userList) {
+            if (!user.equals(activeUser)) {
+                otherUsers.add(user);
+            }
+        }
+        
+        if (otherUsers.isEmpty()) {
+            Toast.makeText(requireContext(), "No hay otras cuentas disponibles", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        final String[] users = otherUsers.toArray(new String[0]);
+        
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Cambiar a cuenta")
+                .setItems(users, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Cambiar al usuario seleccionado
+                        String selectedUser = users[which];
+                        switchToUser(selectedUser);
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+    
+    /**
+     * Cambia al usuario seleccionado
+     */
+    private void switchToUser(String username) {
+        // Cerrar sesión del usuario actual
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getUserSpecificKey(KEY_IS_LOGGED_IN, activeUser), false);
+        
+        // Establecer nuevo usuario activo
+        editor.putString(KEY_ACTIVE_USER, username);
+        editor.putBoolean(getUserSpecificKey(KEY_IS_LOGGED_IN, username), true);
+        editor.apply();
+        
+        // Mostrar mensaje de cambio y reiniciar la aplicación
+        Toast.makeText(requireContext(), "Cambiando a cuenta: " + username, Toast.LENGTH_SHORT).show();
+        
+        // Volver a LoginActivity
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        startActivity(intent);
+        requireActivity().finish();
     }
     
     /**
@@ -235,6 +329,12 @@ public class ProfileFragment extends Fragment {
      * Procesa el cambio de contraseña
      */
     private void changePassword(String currentPassword, String newPassword, String confirmPassword) {
+        // Validar que hay un usuario activo
+        if (activeUser.isEmpty()) {
+            Toast.makeText(requireContext(), "No hay usuario activo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         // Validar campos vacíos
         if (TextUtils.isEmpty(currentPassword) || TextUtils.isEmpty(newPassword) || TextUtils.isEmpty(confirmPassword)) {
             Toast.makeText(requireContext(), "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
@@ -242,7 +342,7 @@ public class ProfileFragment extends Fragment {
         }
         
         // Obtener contraseña almacenada
-        String storedPassword = sharedPreferences.getString(KEY_PASSWORD, "");
+        String storedPassword = sharedPreferences.getString(getUserSpecificKey(KEY_PASSWORD, activeUser), "");
         
         // Si es la primera vez y no hay contraseña almacenada
         if (storedPassword.isEmpty()) {
@@ -276,7 +376,7 @@ public class ProfileFragment extends Fragment {
         
         // Guardar la nueva contraseña
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_PASSWORD, newPassword);
+        editor.putString(getUserSpecificKey(KEY_PASSWORD, activeUser), newPassword);
         editor.apply();
         
         // Mostrar mensaje de éxito
@@ -284,6 +384,13 @@ public class ProfileFragment extends Fragment {
         
         // Enviar notificación de cambio de contraseña
         sendPasswordChangeNotification();
+    }
+    
+    /**
+     * Genera una clave específica para cada usuario
+     */
+    private String getUserSpecificKey(String key, String username) {
+        return username + "_" + key;
     }
     
     /**
@@ -305,10 +412,15 @@ public class ProfileFragment extends Fragment {
      * Realiza el proceso de logout
      */
     private void performLogout() {
+        if (activeUser.isEmpty()) {
+            Toast.makeText(requireContext(), "No hay usuario activo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
         // Limpiar SharedPreferences (marcar como no logueado y quitar mantener sesión)
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(KEY_IS_LOGGED_IN, false);
-        editor.putBoolean(KEY_KEEP_SESSION, false);
+        editor.putBoolean(getUserSpecificKey(KEY_IS_LOGGED_IN, activeUser), false);
+        editor.putBoolean(getUserSpecificKey(KEY_KEEP_SESSION, activeUser), false);
         editor.apply();
         
         // Mostrar un Snackbar para el cierre de sesión

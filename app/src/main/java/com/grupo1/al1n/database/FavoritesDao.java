@@ -2,6 +2,7 @@ package com.grupo1.al1n.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
@@ -18,8 +19,11 @@ import java.util.List;
 public class FavoritesDao {
     
     private static final String TAG = "FavoritesDao";
+    private static final String PREFS_NAME = "AL1N_Prefs";
+    private static final String KEY_ACTIVE_USER = "active_user";
     
     private FavoritesDbHelper dbHelper;
+    private String activeUser;
     
     /**
      * Constructor del DAO
@@ -27,8 +31,20 @@ public class FavoritesDao {
      */
     public FavoritesDao(Context context) {
         dbHelper = new FavoritesDbHelper(context);
+        // Obtener el usuario activo
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        activeUser = sharedPreferences.getString(KEY_ACTIVE_USER, "default_user");
     }
-      /**
+    
+    /**
+     * Establece el usuario activo
+     * @param username Nombre del usuario
+     */
+    public void setActiveUser(String username) {
+        this.activeUser = username.isEmpty() ? "default_user" : username;
+    }
+    
+    /**
      * Inserta un nuevo favorito en la base de datos
      * @param favorite Favorito a insertar
      * @return ID del favorito insertado, -1 si hay error
@@ -37,6 +53,7 @@ public class FavoritesDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
         ContentValues values = new ContentValues();
+        values.put(FavoritesDbHelper.COLUMN_USERNAME, activeUser);
         values.put(FavoritesDbHelper.COLUMN_SYMBOL, favorite.getSymbol());
         values.put(FavoritesDbHelper.COLUMN_NAME, favorite.getName());
         values.put(FavoritesDbHelper.COLUMN_PRICE, favorite.getPrice());
@@ -66,12 +83,16 @@ public class FavoritesDao {
         // Ordenar: pinned primero (DESC), luego por fecha de creación (DESC)
         String orderBy = FavoritesDbHelper.COLUMN_PINNED + " DESC, " + 
                         FavoritesDbHelper.COLUMN_CREATED_AT + " DESC";
+                        
+        // Filtrar por usuario activo
+        String selection = FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = { activeUser };
         
         Cursor cursor = db.query(
             FavoritesDbHelper.TABLE_FAVORITES,
             null, // todas las columnas
-            null, // sin WHERE
-            null, // sin argumentos WHERE
+            selection, // WHERE username = ?
+            selectionArgs, // parámetros para WHERE
             null, // sin GROUP BY
             null, // sin HAVING
             orderBy
@@ -87,7 +108,7 @@ public class FavoritesDao {
         cursor.close();
         db.close();
         
-        Log.d(TAG, "Favoritos cargados: " + favorites.size());
+        Log.d(TAG, "Favoritos cargados para " + activeUser + ": " + favorites.size());
         return favorites;
     }
     
@@ -99,8 +120,9 @@ public class FavoritesDao {
     public FavoriteItem getFavoriteByName(String name) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
-        String selection = FavoritesDbHelper.COLUMN_NAME + " = ?";
-        String[] selectionArgs = { name };
+        String selection = FavoritesDbHelper.COLUMN_NAME + " = ? AND " +
+                          FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = { name, activeUser };
         
         Cursor cursor = db.query(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -135,8 +157,10 @@ public class FavoritesDao {
         ContentValues values = new ContentValues();
         values.put(FavoritesDbHelper.COLUMN_PINNED, pinned ? 1 : 0);
         
-        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ?";
-        String[] whereArgs = { String.valueOf(id) };
+        // Asegurarse de que sea un favorito del usuario activo
+        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { String.valueOf(id), activeUser };
         
         int rowsAffected = db.update(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -163,8 +187,10 @@ public class FavoritesDao {
         ContentValues values = new ContentValues();
         values.put(FavoritesDbHelper.COLUMN_PRICE, price);
         
-        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ?";
-        String[] whereArgs = { String.valueOf(id) };
+        // Asegurarse de que sea un favorito del usuario activo
+        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { String.valueOf(id), activeUser };
         
         int rowsAffected = db.update(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -185,8 +211,10 @@ public class FavoritesDao {
     public int deleteFavorite(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
-        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ?";
-        String[] whereArgs = { String.valueOf(id) };
+        // Asegurarse de que sea un favorito del usuario activo
+        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { String.valueOf(id), activeUser };
         
         int rowsDeleted = db.delete(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -208,8 +236,10 @@ public class FavoritesDao {
     public int deleteFavoriteByName(String name) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
-        String whereClause = FavoritesDbHelper.COLUMN_NAME + " = ?";
-        String[] whereArgs = { name };
+        // Asegurarse de que sea un favorito del usuario activo
+        String whereClause = FavoritesDbHelper.COLUMN_NAME + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { name, activeUser };
         
         int rowsDeleted = db.delete(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -233,13 +263,17 @@ public class FavoritesDao {
     }
     
     /**
-     * Obtiene el número total de favoritos
+     * Obtiene el número total de favoritos para el usuario activo
      * @return Número de favoritos
      */
     public int getFavoritesCount() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
-        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + FavoritesDbHelper.TABLE_FAVORITES, null);
+        String[] args = { activeUser };
+        Cursor cursor = db.rawQuery(
+            "SELECT COUNT(*) FROM " + FavoritesDbHelper.TABLE_FAVORITES + 
+            " WHERE " + FavoritesDbHelper.COLUMN_USERNAME + " = ?", 
+            args);
         int count = 0;
         
         if (cursor.moveToFirst()) {
@@ -251,7 +285,8 @@ public class FavoritesDao {
         
         return count;
     }
-      /**
+    
+    /**
      * Convierte un cursor en un objeto FavoriteItem
      * @param cursor Cursor de la base de datos
      * @return Objeto FavoriteItem
@@ -266,7 +301,9 @@ public class FavoritesDao {
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_CREATED_AT));
         
         return new FavoriteItem(id, symbol, name, price, iconUrl, pinned, createdAt);
-    }    /**
+    }
+    
+    /**
      * Actualiza un favorito completo
      * @param favorite Favorito con datos actualizados
      * @return Número de filas afectadas
@@ -281,8 +318,9 @@ public class FavoritesDao {
         values.put(FavoritesDbHelper.COLUMN_ICON_URL, favorite.getIconUrl());
         values.put(FavoritesDbHelper.COLUMN_PINNED, favorite.isPinned() ? 1 : 0);
         
-        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ?";
-        String[] whereArgs = { String.valueOf(favorite.getId()) };
+        String whereClause = FavoritesDbHelper.COLUMN_ID + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { String.valueOf(favorite.getId()), activeUser };
         
         int rowsAffected = db.update(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -305,8 +343,9 @@ public class FavoritesDao {
     public boolean isFavorite(String symbol) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
-        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
-        String[] selectionArgs = { symbol };
+        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ? AND " +
+                          FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = { symbol, activeUser };
         
         Cursor cursor = db.query(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -333,8 +372,9 @@ public class FavoritesDao {
     public int deleteFavoriteBySymbol(String symbol) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         
-        String whereClause = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
-        String[] whereArgs = { symbol };
+        String whereClause = FavoritesDbHelper.COLUMN_SYMBOL + " = ? AND " +
+                            FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { symbol, activeUser };
         
         int rowsDeleted = db.delete(
             FavoritesDbHelper.TABLE_FAVORITES,
@@ -356,8 +396,9 @@ public class FavoritesDao {
     public FavoriteItem getFavoriteBySymbol(String symbol) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         
-        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ?";
-        String[] selectionArgs = { symbol };
+        String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ? AND " +
+                          FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] selectionArgs = { symbol, activeUser };
         
         Cursor cursor = db.query(
             FavoritesDbHelper.TABLE_FAVORITES,
