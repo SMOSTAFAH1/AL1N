@@ -1,6 +1,6 @@
 package com.grupo32.al1n.services;
 
-import com.grupo32.al1n.models.CoinMarketCapResponse;
+import com.grupo32.al1n.models.Models;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
@@ -21,7 +21,7 @@ public interface CoinMarketCapService {
      * @return Call con la respuesta de CoinMarketCap
      */
     @GET("v1/cryptocurrency/listings/latest")
-    Call<CoinMarketCapResponse> getLatestListings(
+    Call<Models.CoinMarketCapResponse> getLatestListings(
         @Header("X-CMC_PRO_API_KEY") String apiKey,
         @Query("start") Integer start,
         @Query("limit") Integer limit,
@@ -34,7 +34,7 @@ public interface CoinMarketCapService {
      * @return Call con la respuesta de CoinMarketCap (primeras 20 criptomonedas)
      */
     @GET("v1/cryptocurrency/listings/latest")
-    Call<CoinMarketCapResponse> getTopCryptocurrencies(
+    Call<Models.CoinMarketCapResponse> getTopCryptocurrencies(
         @Header("X-CMC_PRO_API_KEY") String apiKey
     );
 }

@@ -1,7 +1,6 @@
 package com.grupo32.al1n.utils;
 
-import com.grupo32.al1n.models.CoinMarketCapResponse;
-import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.Models;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,23 +14,22 @@ public class CryptoDataMapper {
      * @param response Respuesta de la API de CoinMarketCap
      * @return Lista de objetos CryptoItem
      */
-    public static List<CryptoItem> mapToCryptoItems(CoinMarketCapResponse response) {
-        List<CryptoItem> cryptoItems = new ArrayList<>();
+    public static List<Models.CryptoItem> mapToCryptoItems(Models.CoinMarketCapResponse response) {
+        List<Models.CryptoItem> cryptoItems = new ArrayList<>();
         
         if (response == null || response.getData() == null) {
             return cryptoItems;
         }
         
-        for (CoinMarketCapResponse.CryptoData data : response.getData()) {
+        for (Models.CoinMarketCapResponse.CryptoData data : response.getData()) {
             try {
                 // Obtener datos USD
-                CoinMarketCapResponse.USD usdData = data.getQuote().getUsd();
+                Models.CoinMarketCapResponse.USD usdData = data.getQuote().getUsd();
                 
                 // Generar URL de imagen basada en el ID de CoinMarketCap
                 String imageUrl = generateImageUrl(data.getId());
-                
-                // Crear objeto CryptoItem con todos los datos
-                CryptoItem cryptoItem = new CryptoItem(
+                  // Crear objeto CryptoItem con todos los datos
+                Models.CryptoItem cryptoItem = new Models.CryptoItem(
                     String.valueOf(data.getId()),           // id
                     data.getName(),                         // name
                     data.getSymbol(),                       // symbol
@@ -56,13 +54,12 @@ public class CryptoDataMapper {
         
         return cryptoItems;
     }
-    
-    /**
+      /**
      * Calcula el cambio de precio en 24h basado en el precio actual y el porcentaje
      * @param usdData Datos en USD de CoinMarketCap
      * @return Cambio de precio en 24h
      */
-    private static double calculatePriceChange24h(CoinMarketCapResponse.USD usdData) {
+    private static double calculatePriceChange24h(Models.CoinMarketCapResponse.USD usdData) {
         double currentPrice = usdData.getPrice();
         double percentChange = usdData.getPercentChange24h();
         

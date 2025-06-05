@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.grupo32.al1n.R;
 import com.grupo32.al1n.CryptoDetailActivity;
-import com.grupo32.al1n.models.CryptoItem;
-import com.grupo32.al1n.models.FavoriteItem;
+import com.grupo32.al1n.models.Models;
 import com.grupo32.al1n.database.FavoritesDao;
 import com.bumptech.glide.Glide;
 import android.widget.Toast;
@@ -25,12 +24,12 @@ import java.util.List;
 
 public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoViewHolder> {
 
-    private List<CryptoItem> cryptoList;
+    private List<Models.CryptoItem> cryptoList;
     private Context context;
     private DecimalFormat decimalFormat;
     private FavoritesDao favoritesDao;
 
-    public CryptoAdapter(Context context, List<CryptoItem> cryptoList) {
+    public CryptoAdapter(Context context, List<Models.CryptoItem> cryptoList) {
         this.context = context;
         this.cryptoList = cryptoList;
         this.decimalFormat = new DecimalFormat("#,##0.00");
@@ -42,11 +41,9 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
     public CryptoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_crypto, parent, false);
         return new CryptoViewHolder(view);
-    }
-
-    @Override
+    }    @Override
     public void onBindViewHolder(@NonNull CryptoViewHolder holder, int position) {
-        CryptoItem crypto = cryptoList.get(position);
+        Models.CryptoItem crypto = cryptoList.get(position);
         holder.symbolTextView.setText(crypto.getSymbol());
         holder.nameTextView.setText(crypto.getName());
         holder.priceTextView.setText("$" + decimalFormat.format(crypto.getCurrentPrice()));
@@ -93,7 +90,7 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
                 // Mostrar mensaje
                 Toast.makeText(context, crypto.getName() + " removido de favoritos", Toast.LENGTH_SHORT).show();
             } else {
-                FavoriteItem favoriteItem = new FavoriteItem(
+                Models.FavoriteItem favoriteItem = new Models.FavoriteItem(
                         crypto.getSymbol(),
                         crypto.getName(),
                         crypto.getCurrentPrice(),
@@ -136,7 +133,7 @@ public class CryptoAdapter extends RecyclerView.Adapter<CryptoAdapter.CryptoView
             return decimalFormat.format(number);
     }
 
-    public void updateCryptoList(List<CryptoItem> newCryptoList) {
+    public void updateCryptoList(List<Models.CryptoItem> newCryptoList) {
         this.cryptoList = newCryptoList;
         notifyDataSetChanged();
     }

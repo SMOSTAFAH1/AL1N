@@ -30,8 +30,7 @@ import com.grupo32.al1n.CryptoDetailActivity;
 import com.grupo32.al1n.adapters.FavoriteAdapter;
 import com.grupo32.al1n.adapters.CryptoSearchAdapter;
 import com.grupo32.al1n.database.FavoritesDao;
-import com.grupo32.al1n.models.FavoriteItem;
-import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.Models;
 import com.grupo32.al1n.utils.CryptoDataHolder;
 
 import java.util.ArrayList;
@@ -143,7 +142,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                FavoriteItem favorite = favoriteAdapter.getItem(position);
+                Models.FavoriteItem favorite = favoriteAdapter.getItem(position);
 
                 if (favorite != null) {
                     if (direction == ItemTouchHelper.LEFT)
@@ -252,7 +251,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
         AlertDialog dialog = builder.create();
 
         // Configurar RecyclerView de búsqueda
-        List<CryptoItem> searchResults = new ArrayList<>();
+        List<Models.CryptoItem> searchResults = new ArrayList<>();
         CryptoSearchAdapter searchAdapter = new CryptoSearchAdapter(getContext(), searchResults, crypto -> {
             addCryptoToFavorites(crypto);
             dialog.dismiss();
@@ -277,7 +276,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
                     tvNoResults.setText("Escribe para buscar criptomonedas");
                 } else {
                     // Buscar cryptos
-                    List<CryptoItem> results = CryptoDataHolder.getInstance().searchCryptos(query);
+                    List<Models.CryptoItem> results = CryptoDataHolder.getInstance().searchCryptos(query);
 
                     if (results.isEmpty()) {
                         rvSearchResults.setVisibility(View.GONE);
@@ -305,7 +304,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
      * 
      * @param crypto La crypto seleccionada del autocompletado
      */
-    private void addCryptoToFavorites(CryptoItem crypto) {
+    private void addCryptoToFavorites(Models.CryptoItem crypto) {
         // Verificar si ya está en favoritos
         if (favoritesDao.isFavorite(crypto.getSymbol())) {
             Toast.makeText(getContext(),
@@ -314,8 +313,8 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
             return;
         }
 
-        // Crear FavoriteItem desde CryptoItem
-        FavoriteItem favoriteItem = new FavoriteItem(
+        // Crear Models.FavoriteItem desde Models.CryptoItem
+        Models.FavoriteItem favoriteItem = new Models.FavoriteItem(
                 crypto.getSymbol(),
                 crypto.getName(),
                 crypto.getCurrentPrice(),
@@ -341,7 +340,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
      * Carga los favoritos desde la base de datos
      */
     private void loadFavorites() {
-        List<FavoriteItem> favorites = favoritesDao.getAllFavorites();
+        List<Models.FavoriteItem> favorites = favoritesDao.getAllFavorites();
         favoriteAdapter.updateFavorites(favorites);
 
         // Mostrar/ocultar mensaje vacío
@@ -357,7 +356,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
     /**
      * Elimina un favorito
      */
-    private void deleteFavorite(FavoriteItem favorite, int position) {
+    private void deleteFavorite(Models.FavoriteItem favorite, int position) {
         int result = favoritesDao.deleteFavorite(favorite.getId());
         if (result > 0) {
             favoriteAdapter.removeItem(position);
@@ -377,7 +376,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
     /**
      * Toggle del estado de pin
      */
-    private void togglePin(FavoriteItem favorite, int position) {
+    private void togglePin(Models.FavoriteItem favorite, int position) {
         favorite.setPinned(!favorite.isPinned());
         int result = favoritesDao.updateFavorite(favorite);
 
@@ -395,12 +394,12 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
     // Implementación de FavoriteAdapter.OnFavoriteInteractionListener
 
     @Override
-    public void onPinToggle(FavoriteItem favoriteItem, int position) {
+    public void onPinToggle(Models.FavoriteItem favoriteItem, int position) {
         togglePin(favoriteItem, position);
     }
 
     @Override
-    public void onShare(FavoriteItem favoriteItem) {
+    public void onShare(Models.FavoriteItem favoriteItem) {
         String shareText = String.format("¡Mira esta crypto! %s está a $%.2f",
                 favoriteItem.getName(), favoriteItem.getPrice());
 
@@ -413,12 +412,12 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
     }
 
     @Override
-    public void onDelete(FavoriteItem favoriteItem, int position) {
+    public void onDelete(Models.FavoriteItem favoriteItem, int position) {
         deleteFavorite(favoriteItem, position);
     }
 
     @Override
-    public void onItemClick(FavoriteItem favoriteItem) {
+    public void onItemClick(Models.FavoriteItem favoriteItem) {
         // Crear Intent para abrir CryptoDetailActivity
         Intent intent = new Intent(getContext(), CryptoDetailActivity.class);
 
@@ -427,7 +426,7 @@ public class FavoritesFragment extends Fragment implements FavoriteAdapter.OnFav
         intent.putExtra("crypto_name", favoriteItem.getName());
         intent.putExtra("crypto_price", favoriteItem.getPrice());
 
-        // Para los campos que no están en FavoriteItem, usar valores por defecto
+        // Para los campos que no están en Models.FavoriteItem, usar valores por defecto
         intent.putExtra("crypto_change", 0.0); // No tenemos el cambio de precio en favoritos
         intent.putExtra("crypto_market_cap", 0.0); // No tenemos market cap en favoritos
         intent.putExtra("crypto_volume", 0.0); // No tenemos volumen en favoritos

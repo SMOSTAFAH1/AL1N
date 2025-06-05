@@ -8,7 +8,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.grupo32.al1n.models.PriceHistoryItem;
+import com.grupo32.al1n.models.Models;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,12 +61,12 @@ public class ChartUtils {
     /**
      * Actualiza el gráfico con nuevos datos de precio
      */
-    public static void updateChartData(LineChart chart, List<PriceHistoryItem> priceHistory, boolean isPriceUp) {
+    public static void updateChartData(LineChart chart, List<Models.PriceHistoryItem> priceHistory, boolean isPriceUp) {
         ArrayList<Entry> entries = new ArrayList<>();
 
         // Convertir datos históricos a entradas del gráfico
         for (int i = 0; i < priceHistory.size(); i++) {
-            PriceHistoryItem item = priceHistory.get(i);
+            Models.PriceHistoryItem item = priceHistory.get(i);
             entries.add(new Entry(item.getTimestamp(), (float) item.getPrice()));
         }
 
@@ -96,8 +96,8 @@ public class ChartUtils {
     /**
      * Genera datos de muestra para el gráfico (para pruebas)
      */
-    public static List<PriceHistoryItem> generateSampleData(double basePrice, int days) {
-        List<PriceHistoryItem> sampleData = new ArrayList<>();
+    public static List<Models.PriceHistoryItem> generateSampleData(double basePrice, int days) {
+        List<Models.PriceHistoryItem> sampleData = new ArrayList<>();
         long currentTime = System.currentTimeMillis();
         long dayInMillis = 24 * 60 * 60 * 1000L;
 
@@ -110,7 +110,7 @@ public class ChartUtils {
 
             long timestamp = currentTime - (i * dayInMillis);
 
-            sampleData.add(new PriceHistoryItem(timestamp, price, high, low, volume));
+            sampleData.add(new Models.PriceHistoryItem(timestamp, price, high, low, volume));
             basePrice = price; // Para continuidad en el precio
         }
 

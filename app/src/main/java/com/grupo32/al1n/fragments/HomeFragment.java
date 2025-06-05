@@ -15,8 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.grupo32.al1n.R;
 import com.grupo32.al1n.adapters.CryptoAdapter;
-import com.grupo32.al1n.models.CryptoItem;
-import com.grupo32.al1n.models.CoinMarketCapResponse;
+import com.grupo32.al1n.models.Models;
 import com.grupo32.al1n.services.CoinMarketCapClient;
 import com.grupo32.al1n.services.CoinMarketCapService;
 import com.grupo32.al1n.utils.CryptoDataMapper;
@@ -38,7 +37,7 @@ public class HomeFragment extends Fragment {    private static final String TAG 
     // Componentes de la UI
     private RecyclerView recyclerView;
     private CryptoAdapter cryptoAdapter;
-    private List<CryptoItem> cryptoList;
+    private List<Models.CryptoItem> cryptoList;
 
     // Servicio de CoinMarketCap
     private CoinMarketCapService coinMarketCapService;
@@ -108,20 +107,20 @@ public class HomeFragment extends Fragment {    private static final String TAG 
         Log.d(TAG, "Cargando datos de CoinMarketCap API...");
 
         // Realizar llamada a la API para obtener las top 20 criptomonedas
-        Call<CoinMarketCapResponse> call = coinMarketCapService.getLatestListings(
+        Call<Models.CoinMarketCapResponse> call = coinMarketCapService.getLatestListings(
                 CoinMarketCapClient.API_KEY,
                 1, // start - comenzar desde la posición 1
                 20, // limit - obtener 20 criptomonedas
                 "USD" // convert - convertir a USD
         );
 
-        call.enqueue(new Callback<CoinMarketCapResponse>() {            @Override
-            public void onResponse(Call<CoinMarketCapResponse> call, Response<CoinMarketCapResponse> response) {
+        call.enqueue(new Callback<Models.CoinMarketCapResponse>() {            @Override
+            public void onResponse(Call<Models.CoinMarketCapResponse> call, Response<Models.CoinMarketCapResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Datos recibidos exitosamente de CoinMarketCap");
                     
-                    // Convertir respuesta a lista de CryptoItem
-                    List<CryptoItem> apiCryptoList = CryptoDataMapper.mapToCryptoItems(response.body());
+                    // Convertir respuesta a lista de Models.CryptoItem
+                    List<Models.CryptoItem> apiCryptoList = CryptoDataMapper.mapToCryptoItems(response.body());
 
                     // Actualizar la lista en el hilo principal
                     if (getActivity() != null) {
@@ -141,7 +140,7 @@ public class HomeFragment extends Fragment {    private static final String TAG 
                     handleApiError("Error al cargar datos: " + response.code());
                 }
             }            @Override
-            public void onFailure(Call<CoinMarketCapResponse> call, Throwable t) {
+            public void onFailure(Call<Models.CoinMarketCapResponse> call, Throwable t) {
                 Log.e(TAG, "Error en la llamada a la API", t);
                 handleApiError("Sin conexión a internet. No se pudieron cargar los datos.");
             }

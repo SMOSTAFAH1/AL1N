@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.grupo32.al1n.models.PriceHistoryItem;
+import com.grupo32.al1n.models.Models;
 import com.grupo32.al1n.utils.ChartUtils;
 
 import java.text.DecimalFormat;
@@ -260,7 +260,7 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
         updateTimeframeButtons(days);
         
         // Generar datos de muestra para el gráfico
-        List<PriceHistoryItem> priceHistory = ChartUtils.generateSampleData(cryptoPrice, days);
+        List<Models.PriceHistoryItem> priceHistory = ChartUtils.generateSampleData(cryptoPrice, days);
         
         // Actualizar gráfico
         ChartUtils.updateChartData(priceChart, priceHistory, cryptoChange >= 0);

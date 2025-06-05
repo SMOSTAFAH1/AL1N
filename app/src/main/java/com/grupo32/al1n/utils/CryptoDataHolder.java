@@ -1,6 +1,6 @@
 package com.grupo32.al1n.utils;
 
-import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.Models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 public class CryptoDataHolder {
     
     private static CryptoDataHolder instance;
-    private List<CryptoItem> allCryptos;
+    private List<Models.CryptoItem> allCryptos;
     
     private CryptoDataHolder() {
         allCryptos = new ArrayList<>();
@@ -33,7 +33,7 @@ public class CryptoDataHolder {
      * Actualiza la lista completa de cryptos
      * @param cryptos Lista de cryptos obtenidas del API
      */
-    public void updateCryptos(List<CryptoItem> cryptos) {
+    public void updateCryptos(List<Models.CryptoItem> cryptos) {
         allCryptos.clear();
         if (cryptos != null) {
             allCryptos.addAll(cryptos);
@@ -44,7 +44,7 @@ public class CryptoDataHolder {
      * Obtiene todas las cryptos disponibles
      * @return Lista de todas las cryptos
      */
-    public List<CryptoItem> getAllCryptos() {
+    public List<Models.CryptoItem> getAllCryptos() {
         return new ArrayList<>(allCryptos);
     }
     
@@ -53,8 +53,8 @@ public class CryptoDataHolder {
      * @param query Texto de búsqueda (nombre o símbolo)
      * @return Lista filtrada de cryptos que coinciden con la búsqueda
      */
-    public List<CryptoItem> searchCryptos(String query) {
-        List<CryptoItem> filteredList = new ArrayList<>();
+    public List<Models.CryptoItem> searchCryptos(String query) {
+        List<Models.CryptoItem> filteredList = new ArrayList<>();
         
         if (query == null || query.trim().isEmpty()) {
             return filteredList;
@@ -62,7 +62,7 @@ public class CryptoDataHolder {
         
         String lowerQuery = query.toLowerCase().trim();
         
-        for (CryptoItem crypto : allCryptos) {
+        for (Models.CryptoItem crypto : allCryptos) {
             // Buscar por nombre o símbolo
             if (crypto.getName().toLowerCase().contains(lowerQuery) ||
                 crypto.getSymbol().toLowerCase().contains(lowerQuery)) {
@@ -76,14 +76,14 @@ public class CryptoDataHolder {
     /**
      * Busca una crypto específica por símbolo exacto
      * @param symbol Símbolo de la crypto (ej: "BTC")
-     * @return CryptoItem si se encuentra, null en caso contrario
+     * @return Models.CryptoItem si se encuentra, null en caso contrario
      */
-    public CryptoItem findCryptoBySymbol(String symbol) {
+    public Models.CryptoItem findCryptoBySymbol(String symbol) {
         if (symbol == null) return null;
         
         String upperSymbol = symbol.toUpperCase().trim();
         
-        for (CryptoItem crypto : allCryptos) {
+        for (Models.CryptoItem crypto : allCryptos) {
             if (crypto.getSymbol().equalsIgnoreCase(upperSymbol)) {
                 return crypto;
             }

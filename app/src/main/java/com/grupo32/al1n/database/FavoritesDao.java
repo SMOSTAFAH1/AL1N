@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.grupo32.al1n.models.FavoriteItem;
+import com.grupo32.al1n.models.Models;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class FavoritesDao {
      * @param favorite Favorito a insertar
      * @return ID del favorito insertado, -1 si hay error
      */
-    public long insertFavorite(FavoriteItem favorite) {
+    public long insertFavorite(Models.FavoriteItem favorite) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -79,8 +79,8 @@ public class FavoritesDao {
      * 
      * @return Lista de favoritos ordenada
      */
-    public List<FavoriteItem> getAllFavorites() {
-        List<FavoriteItem> favorites = new ArrayList<>();
+    public List<Models.FavoriteItem> getAllFavorites() {
+        List<Models.FavoriteItem> favorites = new ArrayList<>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         // Ordenar: pinned primero (DESC), luego por fecha de creación (DESC)
@@ -102,7 +102,7 @@ public class FavoritesDao {
 
         if (cursor.moveToFirst()) {
             do {
-                FavoriteItem favorite = cursorToFavorite(cursor);
+                Models.FavoriteItem favorite = cursorToFavorite(cursor);
                 favorites.add(favorite);
             } while (cursor.moveToNext());
         }
@@ -120,7 +120,7 @@ public class FavoritesDao {
      * @param name Nombre del favorito
      * @return Favorito encontrado o null si no existe
      */
-    public FavoriteItem getFavoriteByName(String name) {
+    public Models.FavoriteItem getFavoriteByName(String name) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String selection = FavoritesDbHelper.COLUMN_NAME + " = ? AND " +
@@ -136,7 +136,7 @@ public class FavoritesDao {
                 null,
                 null);
 
-        FavoriteItem favorite = null;
+        Models.FavoriteItem favorite = null;
         if (cursor.moveToFirst())
             favorite = cursorToFavorite(cursor);
 
@@ -289,12 +289,12 @@ public class FavoritesDao {
     }
 
     /**
-     * Convierte un cursor en un objeto FavoriteItem
+     * Convierte un cursor en un objeto Models.FavoriteItem
      * 
      * @param cursor Cursor de la base de datos
-     * @return Objeto FavoriteItem
+     * @return Objeto Models.FavoriteItem
      */
-    private FavoriteItem cursorToFavorite(Cursor cursor) {
+    private Models.FavoriteItem cursorToFavorite(Cursor cursor) {
         long id = cursor.getLong(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_ID));
         String symbol = cursor.getString(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_SYMBOL));
         String name = cursor.getString(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_NAME));
@@ -303,7 +303,7 @@ public class FavoritesDao {
         boolean pinned = cursor.getInt(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_PINNED)) == 1;
         long createdAt = cursor.getLong(cursor.getColumnIndexOrThrow(FavoritesDbHelper.COLUMN_CREATED_AT));
 
-        return new FavoriteItem(id, symbol, name, price, iconUrl, pinned, createdAt);
+        return new Models.FavoriteItem(id, symbol, name, price, iconUrl, pinned, createdAt);
     }
 
     /**
@@ -312,7 +312,7 @@ public class FavoritesDao {
      * @param favorite Favorito con datos actualizados
      * @return Número de filas afectadas
      */
-    public int updateFavorite(FavoriteItem favorite) {
+    public int updateFavorite(Models.FavoriteItem favorite) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -397,7 +397,7 @@ public class FavoritesDao {
      * @param symbol Símbolo de la criptomoneda
      * @return Favorito encontrado o null si no existe
      */
-    public FavoriteItem getFavoriteBySymbol(String symbol) {
+    public Models.FavoriteItem getFavoriteBySymbol(String symbol) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         String selection = FavoritesDbHelper.COLUMN_SYMBOL + " = ? AND " +
@@ -413,7 +413,7 @@ public class FavoritesDao {
                 null,
                 null);
 
-        FavoriteItem favorite = null;
+        Models.FavoriteItem favorite = null;
         if (cursor.moveToFirst())
             favorite = cursorToFavorite(cursor);
 

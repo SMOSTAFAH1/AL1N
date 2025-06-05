@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.grupo32.al1n.R;
-import com.grupo32.al1n.models.FavoriteItem;
+import com.grupo32.al1n.models.Models;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -29,20 +29,20 @@ import java.util.Locale;
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
 
     private Context context;
-    private List<FavoriteItem> favoritesList;
+    private List<Models.FavoriteItem> favoritesList;
     private OnFavoriteInteractionListener listener;
 
     /**
      * Interface para manejar interacciones con los elementos favoritos
      */
     public interface OnFavoriteInteractionListener {
-        void onPinToggle(FavoriteItem favoriteItem, int position);
+        void onPinToggle(Models.FavoriteItem favoriteItem, int position);
 
-        void onShare(FavoriteItem favoriteItem);
+        void onShare(Models.FavoriteItem favoriteItem);
 
-        void onDelete(FavoriteItem favoriteItem, int position);
+        void onDelete(Models.FavoriteItem favoriteItem, int position);
 
-        void onItemClick(FavoriteItem favoriteItem);
+        void onItemClick(Models.FavoriteItem favoriteItem);
     }
 
     /**
@@ -52,7 +52,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
      * @param favoritesList Lista de elementos favoritos
      * @param listener      Listener para las interacciones
      */
-    public FavoriteAdapter(Context context, List<FavoriteItem> favoritesList, OnFavoriteInteractionListener listener) {
+    public FavoriteAdapter(Context context, List<Models.FavoriteItem> favoritesList, OnFavoriteInteractionListener listener) {
         this.context = context;
         this.favoritesList = favoritesList != null ? favoritesList : new ArrayList<>();
         this.listener = listener;
@@ -67,7 +67,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
     @Override
     public void onBindViewHolder(@NonNull FavoriteViewHolder holder, int position) {
-        FavoriteItem favorite = favoritesList.get(position);
+        Models.FavoriteItem favorite = favoritesList.get(position);
         holder.bind(favorite);
     }
 
@@ -81,7 +81,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
      * 
      * @param newFavorites Nueva lista de favoritos
      */
-    public void updateFavorites(List<FavoriteItem> newFavorites) {
+    public void updateFavorites(List<Models.FavoriteItem> newFavorites) {
         this.favoritesList.clear();
         if (newFavorites != null)
             this.favoritesList.addAll(newFavorites);
@@ -94,7 +94,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
      * @param position Posición del elemento
      * @return Elemento favorito
      */
-    public FavoriteItem getItem(int position) {
+    public Models.FavoriteItem getItem(int position) {
         if (position >= 0 && position < favoritesList.size())
             return favoritesList.get(position);
         return null;
@@ -118,7 +118,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
      * @param position    Posición del elemento
      * @param updatedItem Elemento actualizado
      */
-    public void updateItem(int position, FavoriteItem updatedItem) {
+    public void updateItem(int position, Models.FavoriteItem updatedItem) {
         if (position >= 0 && position < favoritesList.size()) {
             favoritesList.set(position, updatedItem);
             notifyItemChanged(position);
@@ -160,7 +160,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && listener != null) {
-                        FavoriteItem favorite = favoritesList.get(position);
+                        Models.FavoriteItem favorite = favoritesList.get(position);
                         listener.onItemClick(favorite);
                     }
                 }
@@ -172,7 +172,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && listener != null) {
-                        FavoriteItem favorite = favoritesList.get(position);
+                        Models.FavoriteItem favorite = favoritesList.get(position);
                         listener.onPinToggle(favorite, position);
                     }
                 }
@@ -184,7 +184,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && listener != null) {
-                        FavoriteItem favorite = favoritesList.get(position);
+                        Models.FavoriteItem favorite = favoritesList.get(position);
                         listener.onShare(favorite);
                     }
                 }
@@ -196,7 +196,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                 public boolean onLongClick(View v) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && listener != null) {
-                        FavoriteItem favorite = favoritesList.get(position);
+                        Models.FavoriteItem favorite = favoritesList.get(position);
                         listener.onShare(favorite);
                         return true;
                     }
@@ -210,7 +210,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
          * 
          * @param favorite Elemento favorito a mostrar
          */
-        public void bind(FavoriteItem favorite) {
+        public void bind(Models.FavoriteItem favorite) {
             // Configurar nombre
             tvCryptoName.setText(favorite.getName());
 

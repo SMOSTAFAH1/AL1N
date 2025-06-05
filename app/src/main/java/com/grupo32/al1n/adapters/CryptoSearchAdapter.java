@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.grupo32.al1n.R;
-import com.grupo32.al1n.models.CryptoItem;
+import com.grupo32.al1n.models.Models;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -22,16 +22,16 @@ import java.util.List;
  */
 public class CryptoSearchAdapter extends RecyclerView.Adapter<CryptoSearchAdapter.SearchViewHolder> {
 
-    private List<CryptoItem> cryptoList;
+    private List<Models.CryptoItem> cryptoList;
     private Context context;
     private OnCryptoSelectedListener listener;
     private DecimalFormat decimalFormat;
 
     public interface OnCryptoSelectedListener {
-        void onCryptoSelected(CryptoItem crypto);
+        void onCryptoSelected(Models.CryptoItem crypto);
     }
 
-    public CryptoSearchAdapter(Context context, List<CryptoItem> cryptoList, OnCryptoSelectedListener listener) {
+    public CryptoSearchAdapter(Context context, List<Models.CryptoItem> cryptoList, OnCryptoSelectedListener listener) {
         this.context = context;
         this.cryptoList = cryptoList;
         this.listener = listener;
@@ -47,7 +47,7 @@ public class CryptoSearchAdapter extends RecyclerView.Adapter<CryptoSearchAdapte
 
     @Override
     public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-        CryptoItem crypto = cryptoList.get(position);
+        Models.CryptoItem crypto = cryptoList.get(position);
 
         holder.symbolTextView.setText(crypto.getSymbol());
         holder.nameTextView.setText(crypto.getName());
@@ -79,7 +79,7 @@ public class CryptoSearchAdapter extends RecyclerView.Adapter<CryptoSearchAdapte
     /**
      * Actualiza la lista de cryptos filtradas
      */
-    public void updateList(List<CryptoItem> newList) {
+    public void updateList(List<Models.CryptoItem> newList) {
         this.cryptoList = newList;
         notifyDataSetChanged();
     }
