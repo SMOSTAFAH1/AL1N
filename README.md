@@ -9,7 +9,7 @@ An Android cryptocurrency tracking application developed in Java for mobile devi
 **AL1N** (CryptoTracker) is an Android application developed in **Java** that provides users with the following capabilities:
 
 1. **User Authentication** - Register and login with session persistence option
-2. **Real-time Cryptocurrency Data** - View live prices for cryptocurrencies (Bitcoin, Ethereum, etc.) from external APIs (CoinMarketCap/CoinGecko)
+2. **Real-time Cryptocurrency Data** - View live prices for cryptocurrencies (Bitcoin, Ethereum, etc.) from external API (CoinMarketCap)
 3. **Detailed Views** - Access detailed information for each cryptocurrency with sharing functionality
 4. **Favorites Management** - Add, remove, and organize favorite cryptocurrencies using SQLite database with swipe gestures
 5. **User Profile** - Password management, logout functionality, and system notifications
@@ -50,7 +50,7 @@ The project demonstrates key Android development concepts including Activities, 
 
 ### Data Flow
 1. **Authentication** - User credentials stored in SharedPreferences
-2. **API Integration** - Real-time data fetched from CoinGecko/CoinMarketCap APIs
+2. **API Integration** - Real-time data fetched from CoinMarketCap API
 3. **Local Storage** - Favorites persisted in SQLite database
 4. **UI Updates** - RecyclerView adapters handle data binding and user interactions
 
@@ -90,7 +90,6 @@ The project demonstrates key Android development concepts including Activities, 
    - Click **Run ▶** in Android Studio
 
 ### API Configuration
-- The project uses the public CoinGecko API by default (no API key required)
 - To use CoinMarketCap, update the base URL in `CoinMarketCapClient.java` and add your API key
 
 ---
@@ -171,33 +170,3 @@ AL1N/
 - **Responsive Layout**: Optimized for various screen sizes
 - **Smooth Animations**: RecyclerView animations for item interactions
 - **Bottom Navigation**: Intuitive navigation between main sections
-
----
-
-## 🎯 Future Enhancements
-
-### Potential Improvements
-1. **Automated Updates** - Implement JobService for periodic price updates and notifications
-2. **Advanced Sensors** - Integrate QR scanner for wallet addresses or GPS for location-based features
-3. **Enhanced UI** - Add animations, themes, and improved responsive design
-4. **Internationalization** - Multi-language support with proper localization
-5. **Testing Coverage** - Unit tests for database operations and UI tests with Espresso
-6. **Security** - Enhanced encryption for sensitive user data
-
-### Technical Debt
-- Migrate layouts to ConstraintLayout for better performance
-- Externalize all strings to `strings.xml`
-- Implement proper error handling and loading states
-- Add comprehensive logging and crash reporting
-
----
-
-## 📄 License
-
-This project is developed for educational purposes as part of a mobile device programming course.
-
----
-
-## 🤝 Contributing
-
-This is an academic project. For suggestions or improvements, please open an issue or submit a pull request.
