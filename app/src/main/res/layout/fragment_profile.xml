@@ -56,9 +56,7 @@
         app:layout_constraintTop_toBottomOf="@id/btnChangePassword"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <!-- Botón cerrar sesión -->
+        android:layout_marginTop="16dp" />    <!-- Botón cerrar sesión -->
     <Button
         android:id="@+id/btnLogout"
         android:layout_width="0dp"
@@ -67,6 +65,20 @@
         android:textSize="16sp"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:layout_constraintTop_toBottomOf="@id/btnSwitchAccount"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- Botón eliminar cuenta -->
+    <Button
+        android:id="@+id/btnDeleteAccount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Eliminar cuenta"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@android:color/holo_red_dark"
+        app:layout_constraintTop_toBottomOf="@id/btnLogout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

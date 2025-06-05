@@ -56,14 +56,13 @@ public class ProfileFragment extends Fragment {
     private static final int PASSWORD_CHANGE_NOTIFICATION_ID = 4;
 
     // Código de solicitud para permisos de notificación
-    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 123;
-
-    // Componentes de la UI
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 123;    // Componentes de la UI
     private TextView tvProfileTitle;
     private TextView tvUserInfo;
     private Button btnChangePassword;
     private Button btnLogout;
     private Button btnSwitchAccount;
+    private Button btnDeleteAccount;
 
     // SharedPreferences
     private SharedPreferences sharedPreferences;
@@ -119,12 +118,12 @@ public class ProfileFragment extends Fragment {
      * 
      * @param view Vista raíz del fragment
      */
-    private void initializeComponents(View view) {
-        tvProfileTitle = view.findViewById(R.id.tvProfileTitle);
+    private void initializeComponents(View view) {        tvProfileTitle = view.findViewById(R.id.tvProfileTitle);
         tvUserInfo = view.findViewById(R.id.tvUserInfo);
         btnChangePassword = view.findViewById(R.id.btnChangePassword);
         btnLogout = view.findViewById(R.id.btnLogout);
         btnSwitchAccount = view.findViewById(R.id.btnSwitchAccount);
+        btnDeleteAccount = view.findViewById(R.id.btnDeleteAccount);
 
         sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         activeUser = sharedPreferences.getString(KEY_ACTIVE_USER, "");
@@ -193,9 +192,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 performLogout();
             }
-        });
-
-        // Listener del botón cambiar cuenta (si existe)
+        });        // Listener del botón cambiar cuenta (si existe)
         if (btnSwitchAccount != null) {
             btnSwitchAccount.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -204,6 +201,14 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
+
+        // Listener del botón eliminar cuenta
+        btnDeleteAccount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDeleteAccountDialog();
+            }
+        });
     }
 
     /**
@@ -417,6 +422,97 @@ public class ProfileFragment extends Fragment {
         NotificationManager notificationManager = (NotificationManager) requireContext()
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(PASSWORD_CHANGE_NOTIFICATION_ID, builder.build());
+    }    /**
+     * Muestra el diálogo de confirmación para eliminar la cuenta
+     */
+    private void showDeleteAccountDialog() {
+        if (activeUser.isEmpty()) {
+            Toast.makeText(requireContext(), "No hay usuario activo", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Eliminar cuenta")
+                .setMessage("¿Estás seguro de que quieres eliminar la cuenta '" + activeUser + "'?\n\nEsta acción no se puede deshacer y perderás todos tus favoritos.")
+                .setPositiveButton("Eliminar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteAccount();
+                    }
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
+    }
+
+    /**
+     * Elimina la cuenta del usuario activo
+     */
+    private void deleteAccount() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        
+        // Obtener la lista actual de usuarios
+        Set<String> userList = new HashSet<>(sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>()));
+        
+        // Remover todas las preferencias específicas del usuario
+        editor.remove(getUserSpecificKey(KEY_USERNAME, activeUser));
+        editor.remove(getUserSpecificKey(KEY_PASSWORD, activeUser));
+        editor.remove(getUserSpecificKey(KEY_IS_LOGGED_IN, activeUser));
+        editor.remove(getUserSpecificKey(KEY_KEEP_SESSION, activeUser));
+        
+        // Remover el usuario de la lista
+        userList.remove(activeUser);
+        editor.putStringSet(KEY_USER_LIST, userList);
+        
+        // Limpiar usuario activo
+        editor.remove(KEY_ACTIVE_USER);
+        
+        editor.apply();
+        
+        // Eliminar favoritos del usuario de la base de datos
+        deleteFavoritesFromDatabase(activeUser);
+        
+        // Mostrar mensaje de confirmación
+        Toast.makeText(requireContext(), "Cuenta eliminada correctamente", Toast.LENGTH_LONG).show();
+        
+        // Enviar notificación
+        sendAccountDeletedNotification();
+        
+        // Volver a LoginActivity
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        startActivity(intent);
+        requireActivity().finish();
+    }    /**
+     * Elimina los favoritos del usuario de la base de datos SQLite
+     */
+    private void deleteFavoritesFromDatabase(String username) {
+        try {
+            // Crear instancia del DAO y eliminar todos los favoritos del usuario
+            com.grupo32.al1n.database.FavoritesDao favoritesDao = 
+                new com.grupo32.al1n.database.FavoritesDao(requireContext());
+            
+            int deletedRows = favoritesDao.deleteAllFavoritesForUser(username);
+            android.util.Log.d("ProfileFragment", "Favoritos eliminados para usuario " + username + ": " + deletedRows);
+            
+            favoritesDao.close();
+        } catch (Exception e) {
+            android.util.Log.e("ProfileFragment", "Error eliminando favoritos", e);
+        }
+    }
+
+    /**
+     * Envía notificación de cuenta eliminada
+     */
+    private void sendAccountDeletedNotification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(requireContext(), CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("AL1N")
+                .setContentText("Cuenta eliminada correctamente")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+
+        NotificationManager notificationManager = (NotificationManager) requireContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(5, builder.build()); // ID único para esta notificación
     }
 
     /**

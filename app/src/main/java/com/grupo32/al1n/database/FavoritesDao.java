@@ -424,6 +424,29 @@ public class FavoritesDao {
     }
 
     /**
+     * Elimina todos los favoritos de un usuario específico
+     * 
+     * @param username Nombre del usuario cuyos favoritos se van a eliminar
+     * @return Número de filas eliminadas
+     */
+    public int deleteAllFavoritesForUser(String username) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        String whereClause = FavoritesDbHelper.COLUMN_USERNAME + " = ?";
+        String[] whereArgs = { username };
+
+        int rowsDeleted = db.delete(
+                FavoritesDbHelper.TABLE_FAVORITES,
+                whereClause,
+                whereArgs);
+
+        Log.d(TAG, "Favoritos eliminados para usuario: " + username + ", Filas afectadas: " + rowsDeleted);
+
+        db.close();
+        return rowsDeleted;
+    }
+
+    /**
      * Cierra la conexión a la base de datos
      */
     public void close() {
