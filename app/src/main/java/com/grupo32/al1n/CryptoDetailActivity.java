@@ -31,7 +31,7 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
     private TextView tv24hHigh, tv24hLow, tv24hVolume;
     private TextView tvCirculatingSupply, tvTotalSupply, tvMaxSupply;
     private TextView tvAllTimeHigh, tvAthDate;
-    private ImageButton btnShare, btnFavorite;
+    private ImageButton btnShare;
     private Toolbar toolbar;
     
     // Componentes del gráfico
@@ -42,7 +42,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
     private String cryptoSymbol, cryptoName;
     private double cryptoPrice, cryptoChange, cryptoMarketCap, cryptoVolume;
     private int cryptoRank;
-    private boolean isFavorite;
 
     // Formatter para números
     private DecimalFormat decimalFormat;
@@ -87,7 +86,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
         cryptoMarketCap = intent.getDoubleExtra("crypto_market_cap", 0.0);
         cryptoVolume = intent.getDoubleExtra("crypto_volume", 0.0);
         cryptoRank = intent.getIntExtra("crypto_rank", 0);
-        isFavorite = false; // Por defecto, se implementará en Paso 4
     }    /**
      * Inicializa los componentes de la UI
      */
@@ -101,7 +99,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
         tvVolume = findViewById(R.id.tv_detail_volume);
         tvRank = findViewById(R.id.tv_detail_rank);
         btnShare = findViewById(R.id.btn_detail_share);
-        btnFavorite = findViewById(R.id.btn_detail_favorite);
         
         // Componentes del gráfico
         priceChart = findViewById(R.id.price_chart);
@@ -148,10 +145,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
         
         // Configurar datos adicionales con valores de muestra
         setupAdditionalData();
-        
-        // Configurar botón de favorito
-        int iconRes = isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
-        btnFavorite.setImageResource(iconRes);
     }
 
     /**
@@ -187,7 +180,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
      */
     private void setupListeners() {
         btnShare.setOnClickListener(v -> shareCryptoInfo());
-        btnFavorite.setOnClickListener(v -> toggleFavorite());
         
         // Listeners para botones de timeframe del gráfico
         btn1d.setOnClickListener(v -> loadChartData(1));
@@ -223,19 +215,6 @@ public class CryptoDetailActivity extends AppCompatActivity {    // Componentes 
         if (shareIntent.resolveActivity(getPackageManager()) != null) {
             startActivity(Intent.createChooser(shareIntent, "Share " + cryptoSymbol + " info"));
         }
-    }
-
-    /**
-     * Alterna el estado de favorito
-     */
-    private void toggleFavorite() {
-        isFavorite = !isFavorite;
-        int iconRes = isFavorite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border;
-        btnFavorite.setImageResource(iconRes);
-        
-        String message = isFavorite ? "Added to favorites" : "Removed from favorites";
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-          // TODO: Implementar persistencia en Paso 4 con SQLite
     }
 
     /**
