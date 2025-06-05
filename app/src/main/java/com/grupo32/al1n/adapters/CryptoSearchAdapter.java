@@ -56,20 +56,18 @@ public class CryptoSearchAdapter extends RecyclerView.Adapter<CryptoSearchAdapte
         // Cargar imagen de la criptomoneda
         if (crypto.getImageUrl() != null && !crypto.getImageUrl().isEmpty()) {
             Glide.with(context)
-                .load(crypto.getImageUrl())
-                .placeholder(R.drawable.ic_crypto_placeholder)
-                .error(R.drawable.ic_crypto_placeholder)
-                .circleCrop()
-                .into(holder.iconImageView);
-        } else {
+                    .load(crypto.getImageUrl())
+                    .placeholder(R.drawable.ic_crypto_placeholder)
+                    .error(R.drawable.ic_crypto_placeholder)
+                    .circleCrop()
+                    .into(holder.iconImageView);
+        } else
             holder.iconImageView.setImageResource(R.drawable.ic_crypto_placeholder);
-        }
 
         // Click listener
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
+            if (listener != null)
                 listener.onCryptoSelected(crypto);
-            }
         });
     }
 

@@ -23,27 +23,34 @@ import java.util.Locale;
 
 /**
  * Adapter para el RecyclerView de cryptos favoritos
- * Maneja la visualización de elementos favoritos con funcionalidad de pin y share
+ * Maneja la visualización de elementos favoritos con funcionalidad de pin y
+ * share
  */
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.FavoriteViewHolder> {
 
     private Context context;
     private List<FavoriteItem> favoritesList;
-    private OnFavoriteInteractionListener listener;    /**
+    private OnFavoriteInteractionListener listener;
+
+    /**
      * Interface para manejar interacciones con los elementos favoritos
      */
     public interface OnFavoriteInteractionListener {
         void onPinToggle(FavoriteItem favoriteItem, int position);
+
         void onShare(FavoriteItem favoriteItem);
+
         void onDelete(FavoriteItem favoriteItem, int position);
+
         void onItemClick(FavoriteItem favoriteItem);
     }
 
     /**
      * Constructor del adapter
-     * @param context Contexto de la aplicación
+     * 
+     * @param context       Contexto de la aplicación
      * @param favoritesList Lista de elementos favoritos
-     * @param listener Listener para las interacciones
+     * @param listener      Listener para las interacciones
      */
     public FavoriteAdapter(Context context, List<FavoriteItem> favoritesList, OnFavoriteInteractionListener listener) {
         this.context = context;
@@ -71,30 +78,31 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
     /**
      * Actualiza la lista de favoritos
+     * 
      * @param newFavorites Nueva lista de favoritos
      */
     public void updateFavorites(List<FavoriteItem> newFavorites) {
         this.favoritesList.clear();
-        if (newFavorites != null) {
+        if (newFavorites != null)
             this.favoritesList.addAll(newFavorites);
-        }
         notifyDataSetChanged();
     }
 
     /**
      * Obtiene un elemento favorito por posición
+     * 
      * @param position Posición del elemento
      * @return Elemento favorito
      */
     public FavoriteItem getItem(int position) {
-        if (position >= 0 && position < favoritesList.size()) {
+        if (position >= 0 && position < favoritesList.size())
             return favoritesList.get(position);
-        }
         return null;
     }
 
     /**
      * Elimina un elemento de la lista
+     * 
      * @param position Posición del elemento a eliminar
      */
     public void removeItem(int position) {
@@ -106,7 +114,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
     /**
      * Actualiza un elemento específico
-     * @param position Posición del elemento
+     * 
+     * @param position    Posición del elemento
      * @param updatedItem Elemento actualizado
      */
     public void updateItem(int position, FavoriteItem updatedItem) {
@@ -119,7 +128,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
     /**
      * ViewHolder para los elementos del RecyclerView
      */
-    public class FavoriteViewHolder extends RecyclerView.ViewHolder {        private ImageView ivCryptoIcon;
+    public class FavoriteViewHolder extends RecyclerView.ViewHolder {
+        private ImageView ivCryptoIcon;
         private TextView tvCryptoName;
         private TextView tvCryptoPrice;
         private ImageView ivPinIndicator;
@@ -128,7 +138,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
         public FavoriteViewHolder(@NonNull View itemView) {
             super(itemView);
-              // Inicializar componentes
+            // Inicializar componentes
             ivCryptoIcon = itemView.findViewById(R.id.ivCryptoIcon);
             tvCryptoName = itemView.findViewById(R.id.tvCryptoName);
             tvCryptoPrice = itemView.findViewById(R.id.tvCryptoPrice);
@@ -138,7 +148,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
             // Configurar listeners
             setupListeners();
-        }        /**
+        }
+
+        /**
          * Configura los listeners del ViewHolder
          */
         private void setupListeners() {
@@ -195,6 +207,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
 
         /**
          * Vincula los datos del favorito con la vista
+         * 
          * @param favorite Elemento favorito a mostrar
          */
         public void bind(FavoriteItem favorite) {
@@ -204,7 +217,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
             // Configurar precio con formato
             NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.US);
             String formattedPrice = formatter.format(favorite.getPrice());
-            tvCryptoPrice.setText(formattedPrice);            // Configurar indicador de pin y botón
+            tvCryptoPrice.setText(formattedPrice); // Configurar indicador de pin y botón
             if (favorite.isPinned()) {
                 ivPinIndicator.setVisibility(View.VISIBLE);
                 ivPinIndicator.setColorFilter(context.getResources().getColor(R.color.primary_color));
@@ -224,10 +237,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.Favori
                         .placeholder(R.drawable.ic_crypto_placeholder)
                         .error(R.drawable.ic_crypto_placeholder)
                         .into(ivCryptoIcon);
-            } else {
-                // Usar placeholder si no hay URL
+            } else
                 ivCryptoIcon.setImageResource(R.drawable.ic_crypto_placeholder);
-            }
         }
     }
 }
