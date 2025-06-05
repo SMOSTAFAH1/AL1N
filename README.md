@@ -41,12 +41,13 @@ The project demonstrates key Android development concepts including Activities, 
 ## 🏗️ Architecture
 
 ### Core Components
-- **Activities**: Login, Register, Main, CryptoDetail
+- **Activities**: Login, Register, Main, CryptoDetail (all in main package)
 - **Fragments**: Home, Favorites, Profile
-- **Adapters**: CryptoAdapter, FavoriteAdapter
+- **Adapters**: CryptoAdapter, CryptoSearchAdapter, FavoriteAdapter
 - **Database**: SQLite with FavoritesDbHelper and FavoritesDao
-- **Network**: Retrofit client for API communication
-- **Models**: Data classes for cryptocurrency and favorite items
+- **Services**: CoinMarketCap API client and service interfaces
+- **Models**: Data classes for cryptocurrency items, API responses, and favorite items
+- **Utils**: Data mapping, chart utilities, and notification helpers
 
 ### Data Flow
 1. **Authentication** - User credentials stored in SharedPreferences
@@ -76,12 +77,13 @@ The project demonstrates key Android development concepts including Activities, 
    - Navigate to the cloned AL1N folder
 
 3. **Configure dependencies**
-   The project includes the following dependencies:
-   ```gradle
+   The project includes the following dependencies:   ```gradle
    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
    implementation 'androidx.recyclerview:recyclerview:1.2.1'
    implementation 'com.google.android.material:material:1.4.0'
+   implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+   implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
    ```
 
 4. **Run the application**
@@ -90,7 +92,8 @@ The project demonstrates key Android development concepts including Activities, 
    - Click **Run ▶** in Android Studio
 
 ### API Configuration
-- To use CoinMarketCap, update the base URL in `CoinMarketCapClient.java` and add your API key
+- The project is pre-configured with CoinMarketCap API (base URL: `https://pro-api.coinmarketcap.com/`)
+- API key is already included in `CoinMarketCapClient.java` but can be updated with your own key if needed
 
 ---
 
@@ -119,28 +122,34 @@ AL1N/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/grupo32/al1n/
-│   │   │   │   ├── activities/
-│   │   │   │   │   ├── LoginActivity.java
-│   │   │   │   │   ├── RegisterActivity.java
-│   │   │   │   │   ├── MainActivity.java
-│   │   │   │   │   └── CryptoDetailActivity.java
-│   │   │   │   ├── fragments/
-│   │   │   │   │   ├── HomeFragment.java
-│   │   │   │   │   ├── FavoritesFragment.java
-│   │   │   │   │   └── ProfileFragment.java
+│   │   │   │   ├── CryptoDetailActivity.java
+│   │   │   │   ├── LoginActivity.java
+│   │   │   │   ├── MainActivity.java
+│   │   │   │   ├── RegisterActivity.java
 │   │   │   │   ├── adapters/
 │   │   │   │   │   ├── CryptoAdapter.java
+│   │   │   │   │   ├── CryptoSearchAdapter.java
 │   │   │   │   │   └── FavoriteAdapter.java
 │   │   │   │   ├── database/
-│   │   │   │   │   ├── FavoritesDbHelper.java
-│   │   │   │   │   └── FavoritesDao.java
+│   │   │   │   │   ├── FavoritesDao.java
+│   │   │   │   │   └── FavoritesDbHelper.java
+│   │   │   │   ├── fragments/
+│   │   │   │   │   ├── FavoritesFragment.java
+│   │   │   │   │   ├── HomeFragment.java
+│   │   │   │   │   └── ProfileFragment.java
 │   │   │   │   ├── models/
+│   │   │   │   │   ├── CoinMarketCapResponse.java
+│   │   │   │   │   ├── CryptoDetailInfo.java
 │   │   │   │   │   ├── CryptoItem.java
-│   │   │   │   │   └── FavoriteItem.java
-│   │   │   │   ├── network/
+│   │   │   │   │   ├── FavoriteItem.java
+│   │   │   │   │   └── PriceHistoryItem.java
+│   │   │   │   ├── services/
 │   │   │   │   │   ├── CoinMarketCapClient.java
 │   │   │   │   │   └── CoinMarketCapService.java
 │   │   │   │   └── utils/
+│   │   │   │       ├── ChartUtils.java
+│   │   │   │       ├── CryptoDataHolder.java
+│   │   │   │       ├── CryptoDataMapper.java
 │   │   │   │       └── NotificationHelper.java
 │   │   │   ├── res/
 │   │   │   │   ├── layout/
@@ -161,8 +170,9 @@ AL1N/
 - **Favorites Table**: Manages user's favorite cryptocurrencies with pinning capability
 
 ### API Integration
-- **Retrofit HTTP Client**: Handles asynchronous network requests
-- **JSON Parsing**: Automatic deserialization using Gson converter
+- **Retrofit HTTP Client**: Handles asynchronous network requests to CoinMarketCap API
+- **JSON Parsing**: Automatic deserialization of CoinMarketCap responses using Gson converter
+- **Data Mapping**: Custom utilities to convert CoinMarketCap data to app-specific models
 - **Error Handling**: Graceful handling of network failures and API errors
 
 ### UI/UX Features
