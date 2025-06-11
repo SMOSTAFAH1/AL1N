@@ -29,6 +29,9 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.HashSet;
 import java.util.Set;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class LoginActivity extends AppCompatActivity {
 
     // Constantes para SharedPreferences
@@ -229,9 +232,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword.setText("");
         
         Toast.makeText(this, "Cambiado a cuenta: " + username, Toast.LENGTH_SHORT).show();
-    }
-
-    /**
+    }    /**
      * Realiza el proceso de login
      */
     private void performLogin() {
@@ -241,6 +242,13 @@ public class LoginActivity extends AppCompatActivity {
         // Validar campos vacíos
         if (username.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Verificar si hay usuarios registrados
+        Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
+        if (userList.isEmpty()) {
+            Toast.makeText(this, "No hay cuentas registradas. Por favor, regístrate primero.", Toast.LENGTH_LONG).show();
             return;
         }
         
@@ -258,9 +266,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Usuario o contraseña incorrectos", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    /**
+    }/**
      * Valida las credenciales del usuario
      * @param username Usuario ingresado
      * @param password Contraseña ingresada
@@ -270,11 +276,10 @@ public class LoginActivity extends AppCompatActivity {
         // Obtener lista de usuarios registrados
         Set<String> userList = sharedPreferences.getStringSet(KEY_USER_LIST, new HashSet<String>());
         
-        // Si no hay usuarios registrados, permitir cualquier login (modo demo)
+        // Si no hay usuarios registrados, no permitir login
+        // El usuario debe registrarse primero
         if (userList.isEmpty()) {
-            // Guardar este usuario como el primero
-            saveLoginSession(username, password, cbKeepSession.isChecked());
-            return true;
+            return false;
         }
         
         // Verificar si el usuario existe en la lista
